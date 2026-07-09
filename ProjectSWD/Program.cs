@@ -16,6 +16,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>().AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();
+builder.Services.AddScoped<ProjectSWD.Services.MockPaymentService>();
 
 var app = builder.Build();
 

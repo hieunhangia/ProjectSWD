@@ -5,8 +5,6 @@ namespace ProjectSWD.Data.Enums
         Processing,
         Confirmed,
         Cancelled,
-        Delivered,
-        RefundPending,
-        Refunded
+        Delivered
     }
 }

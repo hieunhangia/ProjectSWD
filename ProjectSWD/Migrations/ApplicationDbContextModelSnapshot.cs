@@ -525,11 +525,6 @@ namespace ProjectSWD.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EvidenceUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 

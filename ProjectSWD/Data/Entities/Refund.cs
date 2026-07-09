@@ -12,9 +12,6 @@ namespace ProjectSWD.Data.Entities
         
         [MaxLength(1000)]
         public string Reason { get; set; }
-        
-        [MaxLength(500)]
-        public string EvidenceUrl { get; set; } 
 
         public RefundStatus Status { get; set; } 
         public DateTime CreatedAt { get; set; }

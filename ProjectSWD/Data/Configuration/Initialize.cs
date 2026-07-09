@@ -823,7 +823,6 @@ namespace ProjectSWD.Data.Configuration
                         FullName = cus2.FullName, PhoneNumber = cus2.Phone,
                         Time = new DateTime(2026, 7, 8, 11, 0, 0),
                         TotalPrice = 165000,
-                        ApprovementStatus = OrderStatus.RefundPending,
                         Customer = cus2, Staff = staff1
                     }
                 );
@@ -945,7 +944,7 @@ namespace ProjectSWD.Data.Configuration
                 var cus1 = await context.Customers.FirstAsync(c => c.Email == "lananh@mail.com");
                 var cus2 = await context.Customers.FirstAsync(c => c.Email == "minhthu@mail.com");
 
-                var oiList = await context.OrderItems.ToListAsync();
+                var oiList = await context.OrderItems.Include(orderItem => orderItem.Product).ToListAsync();
 
                 // Review bột mì đa dụng từ order1
                 var oiBot = oiList.First(o => o.Product.Name == "Bột mì đa dụng (Bột mì số 11)");
@@ -999,7 +998,6 @@ namespace ProjectSWD.Data.Configuration
                     {
                         Amount = 55000,
                         Reason = "Hạnh nhân lát bị mốc, không sử dụng được",
-                        EvidenceUrl = "/images/evidence/refund-hanh-nhan.jpg",
                         Status = RefundStatus.PendingReview,
                         CreatedAt = new DateTime(2026, 7, 8, 14, 0, 0),
                         Order = orders[5] // refund pending order

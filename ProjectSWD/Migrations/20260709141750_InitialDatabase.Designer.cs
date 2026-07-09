@@ -12,8 +12,8 @@ using ProjectSWD.Data;
 namespace ProjectSWD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260709011419_Initial")]
-    partial class Initial
+    [Migration("20260709141750_InitialDatabase")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -527,11 +527,6 @@ namespace ProjectSWD.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("EvidenceUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
