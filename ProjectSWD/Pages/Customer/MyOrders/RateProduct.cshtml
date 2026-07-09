@@ -1,0 +1,101 @@
+@page "{orderId:int}/{productId:int}"
+@model ProjectSWD.Pages.Customer.MyOrders.RateProductModel
+@{
+    ViewData["Title"] = "Rate Product";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h3 class="mb-0 text-primary fw-bold">Rate Your Product</h3>
+                    <p class="text-muted">Order ID: @Model.OrderId | Product ID: @Model.ProductId</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+                        @if (!string.IsNullOrEmpty(Model.ProductImage))
+                        {
+                            <img src="@Model.ProductImage" alt="@Model.ProductName" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" />
+                        }
+                        <div>
+                            <h5 class="mb-1">@Model.ProductName</h5>
+                            <span class="badge bg-secondary">Product ID: @Model.ProductId</span>
+                        </div>
+                    </div>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="/" class="btn btn-primary">Return to Home</a>
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.EligibilityError))
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Cannot submit feedback:</strong> @Model.EligibilityError
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="/" class="btn btn-secondary">Go Back</a>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (!ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                <div asp-validation-summary="All" class="text-danger mb-0"></div>
+                            </div>
+                        }
+
+                        <form method="post">
+                            <div class="mb-4">
+                                <label asp-for="Rating" class="form-label fw-bold">Star Rating</label>
+                                <div class="rating-stars mb-2">
+                                    <select asp-for="Rating" class="form-select w-25">
+                                        <option value="">Select...</option>
+                                        <option value="5">⭐⭐⭐⭐⭐ (5) Excellent</option>
+                                        <option value="4">⭐⭐⭐⭐ (4) Good</option>
+                                        <option value="3">⭐⭐⭐ (3) Average</option>
+                                        <option value="2">⭐⭐ (2) Poor</option>
+                                        <option value="1">⭐ (1) Terrible</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Rating" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Content" class="form-label fw-bold">Write a review</label>
+                                <textarea asp-for="Content" class="form-control" rows="5" placeholder="What did you like or dislike?"></textarea>
+                                <span asp-validation-for="Content" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/" class="btn btn-light me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary px-4">Submit Feedback</button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <style>
+        .card { transition: transform 0.2s ease-in-out; }
+        .card:hover { transform: translateY(-5px); }
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+    </style>
+}

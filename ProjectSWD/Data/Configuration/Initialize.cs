@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSWD.Data.Entities;
 using ProjectSWD.Data.Enums;
 
-namespace ProjectSWD.Data
+namespace ProjectSWD.Data.Configuration
 {
     public static class SeedData
     {
-        public static async Task Initialize(IServiceProvider serviceProvider)
+        public static async Task InitializeAsync(this IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -38,8 +38,14 @@ namespace ProjectSWD.Data
 
                 var staffUsers = new List<IdentityUser>
                 {
-                    new() { UserName = "staff1@bakinghouse.com", Email = "staff1@bakinghouse.com", EmailConfirmed = true },
-                    new() { UserName = "staff2@bakinghouse.com", Email = "staff2@bakinghouse.com", EmailConfirmed = true },
+                    new()
+                    {
+                        UserName = "staff1@bakinghouse.com", Email = "staff1@bakinghouse.com", EmailConfirmed = true
+                    },
+                    new()
+                    {
+                        UserName = "staff2@bakinghouse.com", Email = "staff2@bakinghouse.com", EmailConfirmed = true
+                    },
                 };
                 foreach (var u in staffUsers)
                 {
@@ -191,128 +197,486 @@ namespace ProjectSWD.Data
                 var kg = await context.Units.FirstAsync(u => u.Name == "Kg");
                 var gram = await context.Units.FirstAsync(u => u.Name == "Gram");
                 var lit = await context.Units.FirstAsync(u => u.Name == "Lít");
-                var ml = await context.Units.FirstAsync(u => u.Name == "Ml");
                 var cai = await context.Units.FirstAsync(u => u.Name == "Cái");
                 var hop = await context.Units.FirstAsync(u => u.Name == "Hộp");
                 var chai = await context.Units.FirstAsync(u => u.Name == "Chai");
                 var goi = await context.Units.FirstAsync(u => u.Name == "Gói");
                 var ong = await context.Units.FirstAsync(u => u.Name == "Ống");
-                var bo = await context.Units.FirstAsync(u => u.Name == "Bộ");
 
                 context.Products.AddRange(
                     // ===== Bột & Hỗn hợp làm bánh =====
-                    new Product { Name = "Bột mì đa dụng (Bột mì số 11)", ImageUrl = "/images/products/bot-mi-da-dung.jpg", Price = 32000, Quantity = 80, Category = bot, Unit = kg },
-                    new Product { Name = "Bột mì số 8 (Bột mì Nhật - Cake Flour)", ImageUrl = "/images/products/bot-mi-so-8.jpg", Price = 42000, Quantity = 50, Category = bot, Unit = kg },
-                    new Product { Name = "Bột mì nguyên cám (Whole Wheat Flour)", ImageUrl = "/images/products/bot-nguyen-cam.jpg", Price = 38000, Quantity = 30, Category = bot, Unit = kg },
-                    new Product { Name = "Bột hạnh nhân (Almond Flour) 500g", ImageUrl = "/images/products/bot-hanh-nhan.jpg", Price = 120000, Quantity = 20, Category = bot, Unit = gram },
-                    new Product { Name = "Bột bắp (Corn Starch) 200g", ImageUrl = "/images/products/bot-bap.jpg", Price = 15000, Quantity = 60, Category = bot, Unit = goi },
-                    new Product { Name = "Bột cốt dừa (Coconut Flour) 500g", ImageUrl = "/images/products/bot-cot-dua.jpg", Price = 65000, Quantity = 25, Category = bot, Unit = goi },
-                    new Product { Name = "Bột ca cao nguyên chất 200g", ImageUrl = "/images/products/bot-cacao.jpg", Price = 55000, Quantity = 40, Category = bot, Unit = goi },
-                    new Product { Name = "Hỗn hợp bột làm bánh brownie", ImageUrl = "/images/products/bot-brownie.jpg", Price = 60000, Quantity = 35, Category = bot, Unit = hop },
-                    new Product { Name = "Hỗn hợp bột làm bánh pancake", ImageUrl = "/images/products/bot-pancake.jpg", Price = 45000, Quantity = 40, Category = bot, Unit = hop },
+                    new Product
+                    {
+                        Name = "Bột mì đa dụng (Bột mì số 11)", ImageUrl = "/images/products/bot-mi-da-dung.jpg",
+                        Price = 32000, Quantity = 80, Category = bot, Unit = kg
+                    },
+                    new Product
+                    {
+                        Name = "Bột mì số 8 (Bột mì Nhật - Cake Flour)", ImageUrl = "/images/products/bot-mi-so-8.jpg",
+                        Price = 42000, Quantity = 50, Category = bot, Unit = kg
+                    },
+                    new Product
+                    {
+                        Name = "Bột mì nguyên cám (Whole Wheat Flour)",
+                        ImageUrl = "/images/products/bot-nguyen-cam.jpg", Price = 38000, Quantity = 30, Category = bot,
+                        Unit = kg
+                    },
+                    new Product
+                    {
+                        Name = "Bột hạnh nhân (Almond Flour) 500g", ImageUrl = "/images/products/bot-hanh-nhan.jpg",
+                        Price = 120000, Quantity = 20, Category = bot, Unit = gram
+                    },
+                    new Product
+                    {
+                        Name = "Bột bắp (Corn Starch) 200g", ImageUrl = "/images/products/bot-bap.jpg", Price = 15000,
+                        Quantity = 60, Category = bot, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Bột cốt dừa (Coconut Flour) 500g", ImageUrl = "/images/products/bot-cot-dua.jpg",
+                        Price = 65000, Quantity = 25, Category = bot, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Bột ca cao nguyên chất 200g", ImageUrl = "/images/products/bot-cacao.jpg",
+                        Price = 55000, Quantity = 40, Category = bot, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Hỗn hợp bột làm bánh brownie", ImageUrl = "/images/products/bot-brownie.jpg",
+                        Price = 60000, Quantity = 35, Category = bot, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Hỗn hợp bột làm bánh pancake", ImageUrl = "/images/products/bot-pancake.jpg",
+                        Price = 45000, Quantity = 40, Category = bot, Unit = hop
+                    },
 
                     // ===== Đường & Chất tạo ngọt =====
-                    new Product { Name = "Đường cát trắng tinh luyện 1Kg", ImageUrl = "/images/products/duong-cat.jpg", Price = 22000, Quantity = 100, Category = duong, Unit = kg },
-                    new Product { Name = "Đường bột (Icing Sugar) 500g", ImageUrl = "/images/products/duong-bot.jpg", Price = 35000, Quantity = 50, Category = duong, Unit = goi },
-                    new Product { Name = "Đường nâu (Brown Sugar) 500g", ImageUrl = "/images/products/duong-nau.jpg", Price = 28000, Quantity = 40, Category = duong, Unit = goi },
-                    new Product { Name = "Đường phèn xay nhuyễn 500g", ImageUrl = "/images/products/duong-phen.jpg", Price = 32000, Quantity = 30, Category = duong, Unit = goi },
-                    new Product { Name = "Mật ong rừng nguyên chất 250ml", ImageUrl = "/images/products/mat-ong.jpg", Price = 120000, Quantity = 25, Category = duong, Unit = chai },
-                    new Product { Name = "Xi-rô ngô (Corn Syrup) 400ml", ImageUrl = "/images/products/syrup-ngo.jpg", Price = 55000, Quantity = 20, Category = duong, Unit = chai },
-                    new Product { Name = "Đường vani (Vanilla Sugar) 10g x 6 gói", ImageUrl = "/images/products/duong-vani.jpg", Price = 15000, Quantity = 80, Category = duong, Unit = hop },
+                    new Product
+                    {
+                        Name = "Đường cát trắng tinh luyện 1Kg", ImageUrl = "/images/products/duong-cat.jpg",
+                        Price = 22000, Quantity = 100, Category = duong, Unit = kg
+                    },
+                    new Product
+                    {
+                        Name = "Đường bột (Icing Sugar) 500g", ImageUrl = "/images/products/duong-bot.jpg",
+                        Price = 35000, Quantity = 50, Category = duong, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Đường nâu (Brown Sugar) 500g", ImageUrl = "/images/products/duong-nau.jpg",
+                        Price = 28000, Quantity = 40, Category = duong, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Đường phèn xay nhuyễn 500g", ImageUrl = "/images/products/duong-phen.jpg",
+                        Price = 32000, Quantity = 30, Category = duong, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Mật ong rừng nguyên chất 250ml", ImageUrl = "/images/products/mat-ong.jpg",
+                        Price = 120000, Quantity = 25, Category = duong, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Xi-rô ngô (Corn Syrup) 400ml", ImageUrl = "/images/products/syrup-ngo.jpg",
+                        Price = 55000, Quantity = 20, Category = duong, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Đường vani (Vanilla Sugar) 10g x 6 gói", ImageUrl = "/images/products/duong-vani.jpg",
+                        Price = 15000, Quantity = 80, Category = duong, Unit = hop
+                    },
 
                     // ===== Bơ - Dầu - Shortening =====
-                    new Product { Name = "Bơ lạt (Unsalted Butter) Anchor 200g", ImageUrl = "/images/products/bo-lat-anchor.jpg", Price = 55000, Quantity = 60, Category = boDau, Unit = cai },
-                    new Product { Name = "Bơ lạt (Unsalted Butter) President 200g", ImageUrl = "/images/products/bo-lat-president.jpg", Price = 65000, Quantity = 40, Category = boDau, Unit = cai },
-                    new Product { Name = "Bơ mặn (Salted Butter) 200g", ImageUrl = "/images/products/bo-man.jpg", Price = 50000, Quantity = 30, Category = boDau, Unit = cai },
-                    new Product { Name = "Shortening (Bơ thực vật) Tulo 1Kg", ImageUrl = "/images/products/shortening.jpg", Price = 85000, Quantity = 25, Category = boDau, Unit = kg },
-                    new Product { Name = "Dầu ăn (Dầu hướng dương) 1L", ImageUrl = "/images/products/dau-huong-duong.jpg", Price = 45000, Quantity = 50, Category = boDau, Unit = chai },
-                    new Product { Name = "Dầu dừa nguyên chất 500ml", ImageUrl = "/images/products/dau-dua.jpg", Price = 95000, Quantity = 30, Category = boDau, Unit = chai },
-                    new Product { Name = "Dầu oliu extra virgin 500ml", ImageUrl = "/images/products/dau-olive.jpg", Price = 150000, Quantity = 20, Category = boDau, Unit = chai },
+                    new Product
+                    {
+                        Name = "Bơ lạt (Unsalted Butter) Anchor 200g", ImageUrl = "/images/products/bo-lat-anchor.jpg",
+                        Price = 55000, Quantity = 60, Category = boDau, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Bơ lạt (Unsalted Butter) President 200g",
+                        ImageUrl = "/images/products/bo-lat-president.jpg", Price = 65000, Quantity = 40,
+                        Category = boDau, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Bơ mặn (Salted Butter) 200g", ImageUrl = "/images/products/bo-man.jpg", Price = 50000,
+                        Quantity = 30, Category = boDau, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Shortening (Bơ thực vật) Tulo 1Kg", ImageUrl = "/images/products/shortening.jpg",
+                        Price = 85000, Quantity = 25, Category = boDau, Unit = kg
+                    },
+                    new Product
+                    {
+                        Name = "Dầu ăn (Dầu hướng dương) 1L", ImageUrl = "/images/products/dau-huong-duong.jpg",
+                        Price = 45000, Quantity = 50, Category = boDau, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Dầu dừa nguyên chất 500ml", ImageUrl = "/images/products/dau-dua.jpg", Price = 95000,
+                        Quantity = 30, Category = boDau, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Dầu oliu extra virgin 500ml", ImageUrl = "/images/products/dau-olive.jpg",
+                        Price = 150000, Quantity = 20, Category = boDau, Unit = chai
+                    },
 
                     // ===== Sữa & Chế phẩm sữa =====
-                    new Product { Name = "Sữa tươi không đường Vinamilk 1L", ImageUrl = "/images/products/sua-tuoi.jpg", Price = 32000, Quantity = 80, Category = sua, Unit = chai },
-                    new Product { Name = "Sữa đặc có đường Ông Thọ 380g", ImageUrl = "/images/products/sua-dac.jpg", Price = 28000, Quantity = 100, Category = sua, Unit = hop },
-                    new Product { Name = "Whipping cream (Kem tươi) Anchor 200ml", ImageUrl = "/images/products/whipping-cream.jpg", Price = 45000, Quantity = 50, Category = sua, Unit = hop },
-                    new Product { Name = "Cream cheese Philadelphia 200g", ImageUrl = "/images/products/cream-cheese.jpg", Price = 85000, Quantity = 30, Category = sua, Unit = hop },
-                    new Product { Name = "Sữa chua không đường 100g x 4", ImageUrl = "/images/products/sua-chua.jpg", Price = 15000, Quantity = 60, Category = sua, Unit = hop },
-                    new Product { Name = "Sữa bột nguyên kem 400g", ImageUrl = "/images/products/sua-bot.jpg", Price = 95000, Quantity = 25, Category = sua, Unit = hop },
+                    new Product
+                    {
+                        Name = "Sữa tươi không đường Vinamilk 1L", ImageUrl = "/images/products/sua-tuoi.jpg",
+                        Price = 32000, Quantity = 80, Category = sua, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Sữa đặc có đường Ông Thọ 380g", ImageUrl = "/images/products/sua-dac.jpg",
+                        Price = 28000, Quantity = 100, Category = sua, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Whipping cream (Kem tươi) Anchor 200ml",
+                        ImageUrl = "/images/products/whipping-cream.jpg", Price = 45000, Quantity = 50, Category = sua,
+                        Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Cream cheese Philadelphia 200g", ImageUrl = "/images/products/cream-cheese.jpg",
+                        Price = 85000, Quantity = 30, Category = sua, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Sữa chua không đường 100g x 4", ImageUrl = "/images/products/sua-chua.jpg",
+                        Price = 15000, Quantity = 60, Category = sua, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Sữa bột nguyên kem 400g", ImageUrl = "/images/products/sua-bot.jpg", Price = 95000,
+                        Quantity = 25, Category = sua, Unit = hop
+                    },
 
                     // ===== Trứng & Men nở =====
-                    new Product { Name = "Trứng gà tươi (10 quả)", ImageUrl = "/images/products/trung-ga.jpg", Price = 38000, Quantity = 120, Category = trungMen, Unit = cai },
-                    new Product { Name = "Men nở instant (Instant Dry Yeast) 100g", ImageUrl = "/images/products/men-kho.jpg", Price = 25000, Quantity = 70, Category = trungMen, Unit = goi },
-                    new Product { Name = "Men tươi (Fresh Yeast) 500g", ImageUrl = "/images/products/men-tuoi.jpg", Price = 35000, Quantity = 20, Category = trungMen, Unit = kg },
-                    new Product { Name = "Baking powder (Bột nở) 100g", ImageUrl = "/images/products/baking-powder.jpg", Price = 12000, Quantity = 90, Category = trungMen, Unit = hop },
-                    new Product { Name = "Baking soda (Muối nở) 100g", ImageUrl = "/images/products/baking-soda.jpg", Price = 10000, Quantity = 80, Category = trungMen, Unit = hop },
-                    new Product { Name = "Cream of tartar 50g", ImageUrl = "/images/products/cream-of-tartar.jpg", Price = 30000, Quantity = 40, Category = trungMen, Unit = hop },
-                    new Product { Name = "Gelatin bột (Powder Gelatin) 25g", ImageUrl = "/images/products/gelatin-bot.jpg", Price = 20000, Quantity = 50, Category = trungMen, Unit = goi },
-                    new Product { Name = "Agar-agar (Bột rau câu) 20g", ImageUrl = "/images/products/agar-agar.jpg", Price = 15000, Quantity = 60, Category = trungMen, Unit = goi },
+                    new Product
+                    {
+                        Name = "Trứng gà tươi (10 quả)", ImageUrl = "/images/products/trung-ga.jpg", Price = 38000,
+                        Quantity = 120, Category = trungMen, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Men nở instant (Instant Dry Yeast) 100g", ImageUrl = "/images/products/men-kho.jpg",
+                        Price = 25000, Quantity = 70, Category = trungMen, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Men tươi (Fresh Yeast) 500g", ImageUrl = "/images/products/men-tuoi.jpg", Price = 35000,
+                        Quantity = 20, Category = trungMen, Unit = kg
+                    },
+                    new Product
+                    {
+                        Name = "Baking powder (Bột nở) 100g", ImageUrl = "/images/products/baking-powder.jpg",
+                        Price = 12000, Quantity = 90, Category = trungMen, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Baking soda (Muối nở) 100g", ImageUrl = "/images/products/baking-soda.jpg",
+                        Price = 10000, Quantity = 80, Category = trungMen, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Cream of tartar 50g", ImageUrl = "/images/products/cream-of-tartar.jpg", Price = 30000,
+                        Quantity = 40, Category = trungMen, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Gelatin bột (Powder Gelatin) 25g", ImageUrl = "/images/products/gelatin-bot.jpg",
+                        Price = 20000, Quantity = 50, Category = trungMen, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Agar-agar (Bột rau câu) 20g", ImageUrl = "/images/products/agar-agar.jpg",
+                        Price = 15000, Quantity = 60, Category = trungMen, Unit = goi
+                    },
 
                     // ===== Chocolate & Cacao =====
-                    new Product { Name = "Chocolate đen 70% (Dark Chocolate) 100g", ImageUrl = "/images/products/choco-den.jpg", Price = 55000, Quantity = 45, Category = chocolate, Unit = cai },
-                    new Product { Name = "Chocolate sữa (Milk Chocolate) 100g", ImageUrl = "/images/products/choco-sua.jpg", Price = 48000, Quantity = 50, Category = chocolate, Unit = cai },
-                    new Product { Name = "Chocolate trắng (White Chocolate) 100g", ImageUrl = "/images/products/choco-trang.jpg", Price = 50000, Quantity = 40, Category = chocolate, Unit = cai },
-                    new Product { Name = "Chocolate chip (Giọt socola) bittersweet 200g", ImageUrl = "/images/products/choco-chip.jpg", Price = 65000, Quantity = 35, Category = chocolate, Unit = goi },
-                    new Product { Name = "Bột cacao nguyên chất 100g", ImageUrl = "/images/products/bot-cacao-100g.jpg", Price = 35000, Quantity = 55, Category = chocolate, Unit = goi },
-                    new Product { Name = "Bơ cacao (Cocoa Butter) 100g", ImageUrl = "/images/products/bo-cacao.jpg", Price = 80000, Quantity = 15, Category = chocolate, Unit = cai },
+                    new Product
+                    {
+                        Name = "Chocolate đen 70% (Dark Chocolate) 100g", ImageUrl = "/images/products/choco-den.jpg",
+                        Price = 55000, Quantity = 45, Category = chocolate, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Chocolate sữa (Milk Chocolate) 100g", ImageUrl = "/images/products/choco-sua.jpg",
+                        Price = 48000, Quantity = 50, Category = chocolate, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Chocolate trắng (White Chocolate) 100g", ImageUrl = "/images/products/choco-trang.jpg",
+                        Price = 50000, Quantity = 40, Category = chocolate, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Chocolate chip (Giọt socola) bittersweet 200g",
+                        ImageUrl = "/images/products/choco-chip.jpg", Price = 65000, Quantity = 35,
+                        Category = chocolate, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Bột cacao nguyên chất 100g", ImageUrl = "/images/products/bot-cacao-100g.jpg",
+                        Price = 35000, Quantity = 55, Category = chocolate, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Bơ cacao (Cocoa Butter) 100g", ImageUrl = "/images/products/bo-cacao.jpg",
+                        Price = 80000, Quantity = 15, Category = chocolate, Unit = cai
+                    },
 
                     // ===== Hương liệu & Tinh dầu =====
-                    new Product { Name = "Tinh chất vani (Vanilla Extract) 30ml", ImageUrl = "/images/products/vani-nuoc.jpg", Price = 45000, Quantity = 50, Category = huongLieu, Unit = ong },
-                    new Product { Name = "Vanilla bean (Quả vani) 1 quả", ImageUrl = "/images/products/vani-trai.jpg", Price = 25000, Quantity = 30, Category = huongLieu, Unit = cai },
-                    new Product { Name = "Tinh dầu chanh (Lemon Oil) 30ml", ImageUrl = "/images/products/tinh-dau-chanh.jpg", Price = 35000, Quantity = 40, Category = huongLieu, Unit = ong },
-                    new Product { Name = "Tinh dầu cam (Orange Oil) 30ml", ImageUrl = "/images/products/tinh-dau-cam.jpg", Price = 35000, Quantity = 40, Category = huongLieu, Unit = ong },
-                    new Product { Name = "Tinh dầu bưởi (Grapefruit Oil) 30ml", ImageUrl = "/images/products/tinh-dau-buoi.jpg", Price = 40000, Quantity = 35, Category = huongLieu, Unit = ong },
-                    new Product { Name = "Rượu rum làm bánh (Rum Extract) 60ml", ImageUrl = "/images/products/ruou-rum.jpg", Price = 55000, Quantity = 25, Category = huongLieu, Unit = chai },
-                    new Product { Name = "Bột matcha Nhật (dùng làm bánh) 50g", ImageUrl = "/images/products/matcha.jpg", Price = 95000, Quantity = 20, Category = huongLieu, Unit = hop },
+                    new Product
+                    {
+                        Name = "Tinh chất vani (Vanilla Extract) 30ml", ImageUrl = "/images/products/vani-nuoc.jpg",
+                        Price = 45000, Quantity = 50, Category = huongLieu, Unit = ong
+                    },
+                    new Product
+                    {
+                        Name = "Vanilla bean (Quả vani) 1 quả", ImageUrl = "/images/products/vani-trai.jpg",
+                        Price = 25000, Quantity = 30, Category = huongLieu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Tinh dầu chanh (Lemon Oil) 30ml", ImageUrl = "/images/products/tinh-dau-chanh.jpg",
+                        Price = 35000, Quantity = 40, Category = huongLieu, Unit = ong
+                    },
+                    new Product
+                    {
+                        Name = "Tinh dầu cam (Orange Oil) 30ml", ImageUrl = "/images/products/tinh-dau-cam.jpg",
+                        Price = 35000, Quantity = 40, Category = huongLieu, Unit = ong
+                    },
+                    new Product
+                    {
+                        Name = "Tinh dầu bưởi (Grapefruit Oil) 30ml", ImageUrl = "/images/products/tinh-dau-buoi.jpg",
+                        Price = 40000, Quantity = 35, Category = huongLieu, Unit = ong
+                    },
+                    new Product
+                    {
+                        Name = "Rượu rum làm bánh (Rum Extract) 60ml", ImageUrl = "/images/products/ruou-rum.jpg",
+                        Price = 55000, Quantity = 25, Category = huongLieu, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Bột matcha Nhật (dùng làm bánh) 50g", ImageUrl = "/images/products/matcha.jpg",
+                        Price = 95000, Quantity = 20, Category = huongLieu, Unit = hop
+                    },
 
                     // ===== Trái cây khô & Hạt =====
-                    new Product { Name = "Hạnh nhân lát (Almond Slice) 200g", ImageUrl = "/images/products/hanh-nhan-lat.jpg", Price = 55000, Quantity = 30, Category = hat, Unit = goi },
-                    new Product { Name = "Hạnh nhân nguyên hạt (Almond Whole) 500g", ImageUrl = "/images/products/hanh-nhan-nguyen.jpg", Price = 110000, Quantity = 25, Category = hat, Unit = goi },
-                    new Product { Name = "Óc chó nhân (Walnut Halves) 200g", ImageUrl = "/images/products/oc-cho.jpg", Price = 75000, Quantity = 20, Category = hat, Unit = goi },
-                    new Product { Name = "Hạt điều rang bơ 200g", ImageUrl = "/images/products/hat-dieu.jpg", Price = 45000, Quantity = 35, Category = hat, Unit = goi },
-                    new Product { Name = "Nho khô (Raisin) 200g", ImageUrl = "/images/products/nho-kho.jpg", Price = 25000, Quantity = 50, Category = hat, Unit = goi },
-                    new Product { Name = "Cranberry khô 200g", ImageUrl = "/images/products/cranberry-kho.jpg", Price = 45000, Quantity = 30, Category = hat, Unit = goi },
-                    new Product { Name = "Dừa sấy khô (Desiccated Coconut) 200g", ImageUrl = "/images/products/dua-say.jpg", Price = 22000, Quantity = 40, Category = hat, Unit = goi },
-                    new Product { Name = "Mè trắng (Sesame Seed) 200g", ImageUrl = "/images/products/me-trang.jpg", Price = 18000, Quantity = 45, Category = hat, Unit = goi },
+                    new Product
+                    {
+                        Name = "Hạnh nhân lát (Almond Slice) 200g", ImageUrl = "/images/products/hanh-nhan-lat.jpg",
+                        Price = 55000, Quantity = 30, Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Hạnh nhân nguyên hạt (Almond Whole) 500g",
+                        ImageUrl = "/images/products/hanh-nhan-nguyen.jpg", Price = 110000, Quantity = 25,
+                        Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Óc chó nhân (Walnut Halves) 200g", ImageUrl = "/images/products/oc-cho.jpg",
+                        Price = 75000, Quantity = 20, Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Hạt điều rang bơ 200g", ImageUrl = "/images/products/hat-dieu.jpg", Price = 45000,
+                        Quantity = 35, Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Nho khô (Raisin) 200g", ImageUrl = "/images/products/nho-kho.jpg", Price = 25000,
+                        Quantity = 50, Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Cranberry khô 200g", ImageUrl = "/images/products/cranberry-kho.jpg", Price = 45000,
+                        Quantity = 30, Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Dừa sấy khô (Desiccated Coconut) 200g", ImageUrl = "/images/products/dua-say.jpg",
+                        Price = 22000, Quantity = 40, Category = hat, Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Mè trắng (Sesame Seed) 200g", ImageUrl = "/images/products/me-trang.jpg", Price = 18000,
+                        Quantity = 45, Category = hat, Unit = goi
+                    },
 
                     // ===== Kem tươi & Topping =====
-                    new Product { Name = "Kem tươi whipping (Topping base) 1L", ImageUrl = "/images/products/kem-tuoi-1l.jpg", Price = 95000, Quantity = 30, Category = kem, Unit = lit },
-                    new Product { Name = "Kem tươi Rich's (Topping) 1L", ImageUrl = "/images/products/kem-rich.jpg", Price = 85000, Quantity = 35, Category = kem, Unit = lit },
-                    new Product { Name = "Sốt caramel (Caramel Sauce) 250ml", ImageUrl = "/images/products/sot-caramel.jpg", Price = 40000, Quantity = 30, Category = kem, Unit = chai },
-                    new Product { Name = "Sốt socola (Chocolate Sauce) 250ml", ImageUrl = "/images/products/sot-socola.jpg", Price = 45000, Quantity = 30, Category = kem, Unit = chai },
-                    new Product { Name = "Kem phô mai (Cream Cheese Frosting) 500g", ImageUrl = "/images/products/frosting-phomai.jpg", Price = 75000, Quantity = 20, Category = kem, Unit = hop },
-                    new Product { Name = "Bột pudding (Pudding Mix) 100g", ImageUrl = "/images/products/bot-pudding.jpg", Price = 18000, Quantity = 40, Category = kem, Unit = goi },
+                    new Product
+                    {
+                        Name = "Kem tươi whipping (Topping base) 1L", ImageUrl = "/images/products/kem-tuoi-1l.jpg",
+                        Price = 95000, Quantity = 30, Category = kem, Unit = lit
+                    },
+                    new Product
+                    {
+                        Name = "Kem tươi Rich's (Topping) 1L", ImageUrl = "/images/products/kem-rich.jpg",
+                        Price = 85000, Quantity = 35, Category = kem, Unit = lit
+                    },
+                    new Product
+                    {
+                        Name = "Sốt caramel (Caramel Sauce) 250ml", ImageUrl = "/images/products/sot-caramel.jpg",
+                        Price = 40000, Quantity = 30, Category = kem, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Sốt socola (Chocolate Sauce) 250ml", ImageUrl = "/images/products/sot-socola.jpg",
+                        Price = 45000, Quantity = 30, Category = kem, Unit = chai
+                    },
+                    new Product
+                    {
+                        Name = "Kem phô mai (Cream Cheese Frosting) 500g",
+                        ImageUrl = "/images/products/frosting-phomai.jpg", Price = 75000, Quantity = 20, Category = kem,
+                        Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Bột pudding (Pudding Mix) 100g", ImageUrl = "/images/products/bot-pudding.jpg",
+                        Price = 18000, Quantity = 40, Category = kem, Unit = goi
+                    },
 
                     // ===== Màu thực phẩm & Phụ gia =====
-                    new Product { Name = "Màu thực phẩm dạng gel Cầu Vồng (bộ 8 màu)", ImageUrl = "/images/products/mau-gel-bo.jpg", Price = 85000, Quantity = 25, Category = mau, Unit = hop },
-                    new Product { Name = "Màu đỏ (Red) gel 20g", ImageUrl = "/images/products/mau-do.jpg", Price = 20000, Quantity = 40, Category = mau, Unit = hop },
-                    new Product { Name = "Màu xanh dương (Blue) gel 20g", ImageUrl = "/images/products/mau-xanh-duong.jpg", Price = 20000, Quantity = 40, Category = mau, Unit = hop },
-                    new Product { Name = "Màu hồng (Pink) gel 20g", ImageUrl = "/images/products/mau-hong.jpg", Price = 20000, Quantity = 40, Category = mau, Unit = hop },
-                    new Product { Name = "Màu xanh lá (Green) gel 20g", ImageUrl = "/images/products/mau-xanh-la.jpg", Price = 20000, Quantity = 40, Category = mau, Unit = hop },
-                    new Product { Name = "Bột màu tự nhiên (bột củ dền) 20g", ImageUrl = "/images/products/bot-cu-den.jpg", Price = 35000, Quantity = 20, Category = mau, Unit = hop },
-                    new Product { Name = "Bột trà xanh matcha 30g", ImageUrl = "/images/products/bot-matcha.jpg", Price = 65000, Quantity = 20, Category = mau, Unit = hop },
-                    new Product { Name = "Khuôn bánh silicon (bộ 6 cái)", ImageUrl = "/images/products/khuon-silicon.jpg", Price = 120000, Quantity = 15, Category = mau, Unit = bo },
+                    new Product
+                    {
+                        Name = "Màu thực phẩm dạng gel Cầu Vồng (bộ 8 màu)",
+                        ImageUrl = "/images/products/mau-gel-bo.jpg", Price = 85000, Quantity = 25, Category = mau,
+                        Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Màu đỏ (Red) gel 20g", ImageUrl = "/images/products/mau-do.jpg", Price = 20000,
+                        Quantity = 40, Category = mau, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Màu xanh dương (Blue) gel 20g", ImageUrl = "/images/products/mau-xanh-duong.jpg",
+                        Price = 20000, Quantity = 40, Category = mau, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Màu hồng (Pink) gel 20g", ImageUrl = "/images/products/mau-hong.jpg", Price = 20000,
+                        Quantity = 40, Category = mau, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Màu xanh lá (Green) gel 20g", ImageUrl = "/images/products/mau-xanh-la.jpg",
+                        Price = 20000, Quantity = 40, Category = mau, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Bột màu tự nhiên (bột củ dền) 20g", ImageUrl = "/images/products/bot-cu-den.jpg",
+                        Price = 35000, Quantity = 20, Category = mau, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Bột trà xanh matcha 30g", ImageUrl = "/images/products/bot-matcha.jpg", Price = 65000,
+                        Quantity = 20, Category = mau, Unit = hop
+                    },
 
                     // ===== Nhân bánh & Mứt =====
-                    new Product { Name = "Nhân đậu đỏ (Red Bean Paste) 500g", ImageUrl = "/images/products/nhan-dau-do.jpg", Price = 45000, Quantity = 25, Category = nhan, Unit = hop },
-                    new Product { Name = "Nhân sên khoai môn (Taro Paste) 500g", ImageUrl = "/images/products/nhan-khoai-mon.jpg", Price = 50000, Quantity = 20, Category = nhan, Unit = hop },
-                    new Product { Name = "Mứt dâu tây (Strawberry Jam) 300g", ImageUrl = "/images/products/mut-dau.jpg", Price = 35000, Quantity = 35, Category = nhan, Unit = hop },
-                    new Product { Name = "Mứt cam (Orange Marmalade) 300g", ImageUrl = "/images/products/mut-cam.jpg", Price = 32000, Quantity = 30, Category = nhan, Unit = hop },
-                    new Product { Name = "Mứt việt quất (Blueberry Jam) 300g", ImageUrl = "/images/products/mut-viet-quat.jpg", Price = 42000, Quantity = 25, Category = nhan, Unit = hop },
-                    new Product { Name = "Pate làm bánh (Custard Powder) 100g", ImageUrl = "/images/products/custard-powder.jpg", Price = 22000, Quantity = 40, Category = nhan, Unit = hop },
-                    new Product { Name = "Sốt trứng muối (Salted Egg Yolk Sauce) 200g", ImageUrl = "/images/products/sot-trung-muoi.jpg", Price = 55000, Quantity = 20, Category = nhan, Unit = hop },
+                    new Product
+                    {
+                        Name = "Nhân đậu đỏ (Red Bean Paste) 500g", ImageUrl = "/images/products/nhan-dau-do.jpg",
+                        Price = 45000, Quantity = 25, Category = nhan, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Nhân sên khoai môn (Taro Paste) 500g", ImageUrl = "/images/products/nhan-khoai-mon.jpg",
+                        Price = 50000, Quantity = 20, Category = nhan, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Mứt dâu tây (Strawberry Jam) 300g", ImageUrl = "/images/products/mut-dau.jpg",
+                        Price = 35000, Quantity = 35, Category = nhan, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Mứt cam (Orange Marmalade) 300g", ImageUrl = "/images/products/mut-cam.jpg",
+                        Price = 32000, Quantity = 30, Category = nhan, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Mứt việt quất (Blueberry Jam) 300g", ImageUrl = "/images/products/mut-viet-quat.jpg",
+                        Price = 42000, Quantity = 25, Category = nhan, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Pate làm bánh (Custard Powder) 100g", ImageUrl = "/images/products/custard-powder.jpg",
+                        Price = 22000, Quantity = 40, Category = nhan, Unit = hop
+                    },
+                    new Product
+                    {
+                        Name = "Sốt trứng muối (Salted Egg Yolk Sauce) 200g",
+                        ImageUrl = "/images/products/sot-trung-muoi.jpg", Price = 55000, Quantity = 20, Category = nhan,
+                        Unit = hop
+                    },
 
                     // ===== Dụng cụ làm bánh =====
-                    new Product { Name = "Khuôn bánh tròn 18cm (không rời)", ImageUrl = "/images/products/khuon-tron.jpg", Price = 85000, Quantity = 30, Category = dungCu, Unit = cai },
-                    new Product { Name = "Khuôn bánh vuông 20x20cm (rời đáy)", ImageUrl = "/images/products/khuon-vuong.jpg", Price = 95000, Quantity = 20, Category = dungCu, Unit = cai },
-                    new Product { Name = "Phới lồng (Whisk) inox cỡ lớn", ImageUrl = "/images/products/phoi-long.jpg", Price = 45000, Quantity = 35, Category = dungCu, Unit = cai },
-                    new Product { Name = "Spát silicon (Spatula) chịu nhiệt", ImageUrl = "/images/products/spatula.jpg", Price = 35000, Quantity = 40, Category = dungCu, Unit = cai },
-                    new Product { Name = "Cây cán bột (Rolling Pin) gỗ", ImageUrl = "/images/products/cay-can-bot.jpg", Price = 55000, Quantity = 25, Category = dungCu, Unit = cai },
-                    new Product { Name = "Túi bắt kem (Piping Bag) 12 inch (10 cái)", ImageUrl = "/images/products/tui-bat-kem.jpg", Price = 25000, Quantity = 50, Category = dungCu, Unit = goi },
-                    new Product { Name = "Đui bắt kem (Piping Nozzle) bộ 12 cái", ImageUrl = "/images/products/dui-bat-kem.jpg", Price = 65000, Quantity = 20, Category = dungCu, Unit = bo },
-                    new Product { Name = "Cân điện tử 5Kg (định lượng)", ImageUrl = "/images/products/can-dien-tu.jpg", Price = 180000, Quantity = 10, Category = dungCu, Unit = cai },
-                    new Product { Name = "Rây bột (Flour Sifter) inox 2 lớp", ImageUrl = "/images/products/ray-bot.jpg", Price = 40000, Quantity = 30, Category = dungCu, Unit = cai },
-                    new Product { Name = "Cọ quét bơ (Pastry Brush) silicon", ImageUrl = "/images/products/co-quet-bo.jpg", Price = 25000, Quantity = 35, Category = dungCu, Unit = cai },
-                    new Product { Name = "Giấy lót khuôn (Parchment Paper) 10 tờ", ImageUrl = "/images/products/giay-lot-khuon.jpg", Price = 15000, Quantity = 80, Category = dungCu, Unit = goi }
+                    new Product
+                    {
+                        Name = "Khuôn bánh tròn 18cm (không rời)", ImageUrl = "/images/products/khuon-tron.jpg",
+                        Price = 85000, Quantity = 30, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Khuôn bánh vuông 20x20cm (rời đáy)", ImageUrl = "/images/products/khuon-vuong.jpg",
+                        Price = 95000, Quantity = 20, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Phới lồng (Whisk) inox cỡ lớn", ImageUrl = "/images/products/phoi-long.jpg",
+                        Price = 45000, Quantity = 35, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Spát silicon (Spatula) chịu nhiệt", ImageUrl = "/images/products/spatula.jpg",
+                        Price = 35000, Quantity = 40, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Cây cán bột (Rolling Pin) gỗ", ImageUrl = "/images/products/cay-can-bot.jpg",
+                        Price = 55000, Quantity = 25, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Túi bắt kem (Piping Bag) 12 inch (10 cái)",
+                        ImageUrl = "/images/products/tui-bat-kem.jpg", Price = 25000, Quantity = 50, Category = dungCu,
+                        Unit = goi
+                    },
+                    new Product
+                    {
+                        Name = "Cân điện tử 5Kg (định lượng)", ImageUrl = "/images/products/can-dien-tu.jpg",
+                        Price = 180000, Quantity = 10, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Rây bột (Flour Sifter) inox 2 lớp", ImageUrl = "/images/products/ray-bot.jpg",
+                        Price = 40000, Quantity = 30, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Cọ quét bơ (Pastry Brush) silicon", ImageUrl = "/images/products/co-quet-bo.jpg",
+                        Price = 25000, Quantity = 35, Category = dungCu, Unit = cai
+                    },
+                    new Product
+                    {
+                        Name = "Giấy lót khuôn (Parchment Paper) 10 tờ",
+                        ImageUrl = "/images/products/giay-lot-khuon.jpg", Price = 15000, Quantity = 80,
+                        Category = dungCu, Unit = goi
+                    }
                 );
                 await context.SaveChangesAsync();
             }
@@ -322,7 +686,8 @@ namespace ProjectSWD.Data
             {
                 context.DeliveryPartners.AddRange(
                     new DeliveryPartner { Name = "Giao hàng nhanh (GHN)", Email = "ghn@ghn.vn", Phone = "1900636467" },
-                    new DeliveryPartner { Name = "Giao hàng tiết kiệm (GHTK)", Email = "ghtk@ghtk.vn", Phone = "1900636425" },
+                    new DeliveryPartner
+                        { Name = "Giao hàng tiết kiệm (GHTK)", Email = "ghtk@ghtk.vn", Phone = "1900636425" },
                     new DeliveryPartner { Name = "Viettel Post", Email = "viettpost@viettpost.vn", Phone = "18008000" }
                 );
                 await context.SaveChangesAsync();
@@ -344,7 +709,8 @@ namespace ProjectSWD.Data
                     new Promotion
                     {
                         Name = "Flash Sale: Bột & Đường giảm 15%",
-                        Description = "Giảm 15% cho tất cả sản phẩm bột và đường — Chuẩn bị nguyên liệu cho mẻ bánh mới!",
+                        Description =
+                            "Giảm 15% cho tất cả sản phẩm bột và đường — Chuẩn bị nguyên liệu cho mẻ bánh mới!",
                         Percentage = 15, FixedAmount = null,
                         MinimumOrder = 100000, UsageLimit = 50,
                         StartTime = new DateTime(2026, 7, 1),
@@ -353,7 +719,8 @@ namespace ProjectSWD.Data
                     new Promotion
                     {
                         Name = "Giảm 50K cho đơn từ 500K",
-                        Description = "Giảm ngay 50.000đ cho đơn hàng từ 500.000đ — Nhập nguyên liệu làm bánh số lượng lớn!",
+                        Description =
+                            "Giảm ngay 50.000đ cho đơn hàng từ 500.000đ — Nhập nguyên liệu làm bánh số lượng lớn!",
                         Percentage = null, FixedAmount = 50000,
                         MinimumOrder = 500000, UsageLimit = 30,
                         StartTime = new DateTime(2026, 6, 15),
@@ -469,15 +836,19 @@ namespace ProjectSWD.Data
                 var orders = await context.Orders.ToListAsync();
 
                 var botMiDaDung = await context.Products.FirstAsync(p => p.Name == "Bột mì đa dụng (Bột mì số 11)");
-                var boLatAnchor = await context.Products.FirstAsync(p => p.Name == "Bơ lạt (Unsalted Butter) Anchor 200g");
+                var boLatAnchor =
+                    await context.Products.FirstAsync(p => p.Name == "Bơ lạt (Unsalted Butter) Anchor 200g");
                 var trungGa = await context.Products.FirstAsync(p => p.Name == "Trứng gà tươi (10 quả)");
                 var duongCat = await context.Products.FirstAsync(p => p.Name == "Đường cát trắng tinh luyện 1Kg");
                 var vani = await context.Products.FirstAsync(p => p.Name == "Tinh chất vani (Vanilla Extract) 30ml");
-                var whipping = await context.Products.FirstAsync(p => p.Name == "Whipping cream (Kem tươi) Anchor 200ml");
+                var whipping =
+                    await context.Products.FirstAsync(p => p.Name == "Whipping cream (Kem tươi) Anchor 200ml");
                 var creamCheese = await context.Products.FirstAsync(p => p.Name == "Cream cheese Philadelphia 200g");
-                var chocoDen = await context.Products.FirstAsync(p => p.Name == "Chocolate đen 70% (Dark Chocolate) 100g");
+                var chocoDen =
+                    await context.Products.FirstAsync(p => p.Name == "Chocolate đen 70% (Dark Chocolate) 100g");
                 var botCacao = await context.Products.FirstAsync(p => p.Name == "Bột cacao nguyên chất 100g");
-                var menKho = await context.Products.FirstAsync(p => p.Name == "Men nở instant (Instant Dry Yeast) 100g");
+                var menKho =
+                    await context.Products.FirstAsync(p => p.Name == "Men nở instant (Instant Dry Yeast) 100g");
                 var hanhNhan = await context.Products.FirstAsync(p => p.Name == "Hạnh nhân lát (Almond Slice) 200g");
                 var bakingPowder = await context.Products.FirstAsync(p => p.Name == "Baking powder (Bột nở) 100g");
                 var suaDac = await context.Products.FirstAsync(p => p.Name == "Sữa đặc có đường Ông Thọ 380g");

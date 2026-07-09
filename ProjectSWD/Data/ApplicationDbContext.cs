@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectSWD.Data.Entities;
@@ -7,7 +6,6 @@ namespace ProjectSWD.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
     {
-
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<Admin> Admins { get; set; }
@@ -48,7 +46,8 @@ namespace ProjectSWD.Data
                 .HasMaxLength(50);
 
 
-            var decimal18_2_Props = new[] { 
+            var decimal18_2_Props = new[]
+            {
                 typeof(Product).GetProperty("Price"),
                 typeof(Order).GetProperty("TotalPrice"),
                 typeof(OrderItem).GetProperty("Price"),
@@ -61,7 +60,8 @@ namespace ProjectSWD.Data
             foreach (var prop in decimal18_2_Props)
                 modelBuilder.Entity(prop.DeclaringType).Property(prop.Name).HasColumnType("decimal(18, 2)");
 
-            var decimal10_2_Props = new[] {
+            var decimal10_2_Props = new[]
+            {
                 typeof(Product).GetProperty("Quantity"),
                 typeof(OrderItem).GetProperty("Quantity"),
                 typeof(RefundItem).GetProperty("Quantity")
@@ -83,7 +83,7 @@ namespace ProjectSWD.Data
             modelBuilder.Entity<RefundItem>()
                 .HasKey(ri => new { ri.RefundId, ri.ProductId });
 
-            
+
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Customer).WithMany(c => c.Orders)
                 .HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.Restrict);
