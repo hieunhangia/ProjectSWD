@@ -3,7 +3,7 @@ namespace ProjectSWD.Data.Enums
     public enum RefundStatus
     {
         PendingReview,
-        Approved,
+        Refunded,
         Rejected
     }
 }
