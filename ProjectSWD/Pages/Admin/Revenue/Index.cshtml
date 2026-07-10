@@ -1,0 +1,230 @@
+@page
+@model ProjectSWD.Pages.Admin.Revenue.IndexModel
+@{
+    ViewData["Title"] = "Báo cáo doanh thu";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">
+        <i class="bi bi-graph-up"></i> @ViewData["Title"]
+    </h2>
+
+    <!-- Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Từ ngày</label>
+                    <input type="date" name="StartDate" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Đến ngày</label>
+                    <input type="date" name="EndDate" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Năm</label>
+                    <select name="SelectedYear" class="form-select">
+                        @for (int y = DateTime.Now.Year; y >= DateTime.Now.Year - 5; y--)
+                        {
+                            <option value="@y" selected="@(y == Model.SelectedYear)">@y</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Xem báo cáo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="bi bi-currency-dollar"></i> Tổng doanh thu
+                    </h5>
+                    <h2 class="mb-0 fw-bold">@Model.Summary.TotalRevenue.ToString("N0")₫</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="bi bi-bag-check"></i> Tổng đơn hàng
+                    </h5>
+                    <h2 class="mb-0 fw-bold">@Model.Summary.TotalOrders</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="bi bi-calculator"></i> Giá trị TB mỗi đơn
+                    </h5>
+                    <h2 class="mb-0 fw-bold">@Model.Summary.AverageOrderValue.ToString("N0")₫</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Daily Revenue Chart -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-bar-chart"></i> Doanh thu theo ngày
+                </div>
+                <div class="card-body">
+                    @if (Model.DailyRevenues.Any())
+                    {
+                        <canvas id="revenueChart" height="250"></canvas>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center my-4">Chưa có dữ liệu doanh thu trong khoảng thời gian này.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-calendar3"></i> Doanh thu theo tháng (@Model.SelectedYear)
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.MonthlyRevenues.Any())
+                    {
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tháng</th>
+                                    <th class="text-end">Doanh thu</th>
+                                    <th class="text-end">Đơn hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.MonthlyRevenues)
+                                {
+                                    <tr>
+                                        <td>Tháng @item.Month</td>
+                                        <td class="text-end">@item.Revenue.ToString("N0")₫</td>
+                                        <td class="text-end">@item.OrderCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center my-4">Chưa có dữ liệu.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Products -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white fw-bold">
+            <i class="bi bi-trophy"></i> Top 10 sản phẩm bán chạy
+        </div>
+        <div class="card-body p-0">
+            @if (Model.TopProducts.Any())
+            {
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Sản phẩm</th>
+                            <th class="text-end">Số lượng đã bán</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.TopProducts.Count; i++)
+                        {
+                            var p = Model.TopProducts[i];
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>@p.ProductName</td>
+                                <td class="text-end">@p.TotalQuantity.ToString("N2")</td>
+                                <td class="text-end fw-bold text-success">@p.TotalRevenue.ToString("N0")₫</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted text-center my-4">Chưa có dữ liệu sản phẩm bán chạy.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        @if (Model.DailyRevenues.Any())
+        {
+            <text>
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [@string.Join(", ", Model.DailyRevenues.Select(d => $"'{d.Date.ToString("dd/MM")}'"))],
+                    datasets: [
+                        {
+                            label: 'Doanh thu (₫)',
+                            data: [@string.Join(", ", Model.DailyRevenues.Select(d => d.Revenue))],
+                            backgroundColor: 'rgba(13, 110, 253, 0.6)',
+                            borderColor: 'rgba(13, 110, 253, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Đơn hàng',
+                            data: [@string.Join(", ", Model.DailyRevenues.Select(d => d.OrderCount))],
+                            backgroundColor: 'rgba(25, 135, 84, 0.6)',
+                            borderColor: 'rgba(25, 135, 84, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Doanh thu (₫)' },
+                            ticks: { callback: v => v.toLocaleString() + '₫' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Đơn hàng' },
+                            grid: { drawOnChartArea: false },
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}

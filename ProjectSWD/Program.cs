@@ -20,6 +20,8 @@ builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();
 builder.Services.AddScoped<ProjectSWD.Services.MockPaymentService>();
 builder.Services.AddScoped<ProjectSWD.Services.Admin.PromotionService>();
 builder.Services.AddScoped<ProjectSWD.Services.Admin.RefundService>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.ProfileService>();
+builder.Services.AddScoped<ProjectSWD.Services.Admin.RevenueService>();
 
 var app = builder.Build();
 
