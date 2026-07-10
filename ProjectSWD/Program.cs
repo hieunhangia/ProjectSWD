@@ -18,6 +18,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();
 builder.Services.AddScoped<ProjectSWD.Services.MockPaymentService>();
+builder.Services.AddScoped<ProjectSWD.Services.Admin.PromotionService>();
 
 var app = builder.Build();
 

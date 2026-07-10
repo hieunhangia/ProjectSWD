@@ -1,0 +1,192 @@
+@page
+@model ProjectSWD.Pages.Admin.Promotion.IndexModel
+@{
+    ViewData["Title"] = "Quản lý khuyến mãi";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">@ViewData["Title"]</h2>
+        <a href="/Admin/Promotion/ConfigPromotion" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Tạo khuyến mãi mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Search -->
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="SearchTerm" class="form-control" placeholder="Tìm kiếm khuyến mãi..." value="@Model.SearchTerm" />
+            <button type="submit" class="btn btn-outline-secondary">
+                <i class="bi bi-search"></i> Tìm
+            </button>
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <a href="/Admin/Promotion/Index" class="btn btn-outline-danger">Xóa tìm kiếm</a>
+            }
+        </div>
+    </form>
+
+    @if (!Model.Promotions.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <span>Không tìm thấy khuyến mãi nào phù hợp với "<strong>@Model.SearchTerm</strong>".</span>
+            }
+            else
+            {
+                <span>Chưa có khuyến mãi nào. <a href="/Admin/Promotion/ConfigPromotion" class="alert-link">Tạo khuyến mãi đầu tiên</a>.</span>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên khuyến mãi</th>
+                        <th>Giảm giá</th>
+                        <th>Thời gian</th>
+                        <th>Đơn tối thiểu</th>
+                        <th>SL đã dùng</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var promo in Model.Promotions)
+                    {
+                        var now = DateTime.Now;
+                        var isActive = promo.StartTime <= now && promo.EndTime >= now;
+                        var isUpcoming = promo.StartTime > now;
+                        var isExpired = promo.EndTime < now;
+
+                        <tr>
+                            <td>@promo.Id</td>
+                            <td>
+                                <strong>@promo.Name</strong>
+                                @if (!string.IsNullOrEmpty(promo.Description))
+                                {
+                                    <br /><small class="text-muted">@promo.Description</small>
+                                }
+                            </td>
+                            <td>
+                                @if (promo.FixedAmount.HasValue)
+                                {
+                                    <span class="badge bg-success">@promo.FixedAmount.Value:N0₫</span>
+                                }
+                                @if (promo.Percentage.HasValue)
+                                {
+                                    <span class="badge bg-warning text-dark">@promo.Percentage.Value%</span>
+                                }
+                                @if (!promo.FixedAmount.HasValue && !promo.Percentage.HasValue)
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td>
+                                <small>
+                                    <strong>Bắt đầu:</strong> @promo.StartTime.ToString("dd/MM/yyyy HH:mm")<br />
+                                    <strong>Kết thúc:</strong> @promo.EndTime.ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                            </td>
+                            <td>
+                                @if (promo.MinimumOrder.HasValue)
+                                {
+                                    <span>@promo.MinimumOrder.Value:N0₫</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td>
+                                @if (promo.UsageLimit.HasValue)
+                                {
+                                    <span>@promo.UsageLimit.Value</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">∞</span>
+                                }
+                            </td>
+                            <td>
+                                @if (isActive)
+                                {
+                                    <span class="badge bg-success">Đang diễn ra</span>
+                                }
+                                else if (isUpcoming)
+                                {
+                                    <span class="badge bg-info text-dark">Sắp diễn ra</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Đã kết thúc</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Admin/Promotion/ConfigPromotion/@promo.Id" class="btn btn-outline-primary" title="Sửa">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" title="Xóa"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="@promo.Id" data-name="@promo.Name">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc muốn xóa khuyến mãi <strong id="deleteName"></strong>?</p>
+                <p class="text-danger mb-0"><small>Hành động này không thể hoàn tác.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form method="post" asp-page-handler="Delete">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            document.getElementById('deleteId').value = id;
+            document.getElementById('deleteName').textContent = name;
+        });
+    </script>
+}
