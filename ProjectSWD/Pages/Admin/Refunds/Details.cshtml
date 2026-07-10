@@ -1,0 +1,125 @@
+@page "{id:int}"
+@using ProjectSWD.Data.Enums
+@model ProjectSWD.Pages.Admin.Refunds.DetailsModel
+@{
+    ViewData["Title"] = "Refund Details";
+    var refund = Model.RefundData;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Refund Request Details #@refund.Id</h2>
+        <a asp-page="./Index" class="btn btn-secondary">Back to list</a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Customer & Order Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Customer:</strong> @(refund.Order?.Customer?.FullName ?? "N/A")</p>
+                    <p><strong>Order ID:</strong> #@refund.OrderId</p>
+                    <p><strong>Order Date:</strong> @(refund.Order?.Time.ToString("MM/dd/yyyy HH:mm") ?? "N/A")</p>
+                    <p><strong>Phone Number:</strong> @(refund.Order?.PhoneNumber ?? "N/A")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Refund Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Requested Amount:</strong> <span class="text-danger fw-bold">@refund.Amount.ToString("N0") VND</span></p>
+                    <p><strong>Requested Date:</strong> @refund.CreatedAt.ToString("MM/dd/yyyy HH:mm")</p>
+                    <p>
+                        <strong>Status:</strong> 
+                        @if (refund.Status == RefundStatus.PendingReview)
+                        {
+                            <span class="badge bg-warning text-dark">Pending Review</span>
+                        }
+                        else if (refund.Status == RefundStatus.Refunded)
+                        {
+                            <span class="badge bg-success">Refunded</span>
+                        }
+                        else if (refund.Status == RefundStatus.Rejected)
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                    </p>
+                    <p><strong>Reason:</strong> @refund.Reason</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Refund Items</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Refund Quantity</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (refund.RefundItems != null && refund.RefundItems.Any())
+                        {
+                            @foreach (var item in refund.RefundItems)
+                            {
+                                <tr>
+                                    <td>@(item.Product?.Name ?? "N/A")</td>
+                                    <td>@item.Price.ToString("N0") VND</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@((item.Price * item.Quantity).ToString("N0")) VND</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No items found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (refund.Status == RefundStatus.PendingReview)
+    {
+        <div class="d-flex justify-content-end gap-3">
+            <form method="post" asp-page-handler="Reject">
+                <input type="hidden" name="id" value="@refund.Id" />
+                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to REJECT this refund request?');">
+                    <i class="bi bi-x-circle me-1"></i> Reject Refund
+                </button>
+            </form>
+
+            <form method="post" asp-page-handler="Approve">
+                <input type="hidden" name="id" value="@refund.Id" />
+                <button type="submit" class="btn btn-success" onclick="return confirm('Confirm APPROVE refund request? This will process payment via Payment Gateway.');">
+                    <i class="bi bi-check-circle me-1"></i> Approve & Transfer
+                </button>
+            </form>
+        </div>
+    }
+</div>

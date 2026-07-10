@@ -19,6 +19,7 @@ builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();
 builder.Services.AddScoped<ProjectSWD.Services.MockPaymentService>();
 builder.Services.AddScoped<ProjectSWD.Services.Admin.PromotionService>();
+builder.Services.AddScoped<ProjectSWD.Services.Admin.RefundService>();
 
 var app = builder.Build();
 
