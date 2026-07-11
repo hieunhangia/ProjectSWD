@@ -1026,6 +1026,46 @@ namespace ProjectSWD.Data.Configuration
                 );
                 await context.SaveChangesAsync();
             }
+
+            // ======================== CART ITEMS ========================
+            if (!context.CartItems.Any())
+            {
+                var allCustomers = context.Customers.ToList();
+
+                var products = context.Products.ToList();
+
+                if (allCustomers.Any() && products.Count >= 2)
+                {
+                    var sampleCartItems = new List<CartItem>();
+
+                    foreach (var customer in allCustomers)
+                    {
+                        sampleCartItems.Add(new CartItem
+                        {
+                            CustomerId = customer.Id,
+                            ProductId = products[Random.Shared.Next(1, 88)].Id,
+                            Quantity = Random.Shared.Next(1, 10)
+                        });
+
+                        sampleCartItems.Add(new CartItem
+                        {
+                            CustomerId = customer.Id,
+                            ProductId = products[Random.Shared.Next(1, 88)].Id,
+                            Quantity = Random.Shared.Next(1, 10)
+                        });
+
+                        sampleCartItems.Add(new CartItem
+                        {
+                            CustomerId = customer.Id,
+                            ProductId = products[Random.Shared.Next(1, 88)].Id,
+                            Quantity = Random.Shared.Next(1, 10)
+                        });
+                    }
+
+                    context.CartItems.AddRange(sampleCartItems);
+                    await context.SaveChangesAsync();
+                }
+            }
         }
     }
 }

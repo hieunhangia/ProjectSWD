@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectSWD.Data;
 
@@ -11,9 +12,11 @@ using ProjectSWD.Data;
 namespace ProjectSWD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260710133417_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,24 +272,6 @@ namespace ProjectSWD.Migrations
                         .IsUnique();
 
                     b.ToTable("Bills");
-                });
-
-            modelBuilder.Entity("ProjectSWD.Data.Entities.CartItem", b =>
-                {
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(10, 2)");
-
-                    b.HasKey("CustomerId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("ProjectSWD.Data.Entities.Category", b =>
@@ -763,25 +748,6 @@ namespace ProjectSWD.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("ProjectSWD.Data.Entities.CartItem", b =>
-                {
-                    b.HasOne("ProjectSWD.Data.Entities.Customer", "Customer")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectSWD.Data.Entities.Product", "Product")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("ProjectSWD.Data.Entities.Customer", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
@@ -954,8 +920,6 @@ namespace ProjectSWD.Migrations
 
             modelBuilder.Entity("ProjectSWD.Data.Entities.Customer", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("Orders");
 
                     b.Navigation("Reviews");
@@ -987,8 +951,6 @@ namespace ProjectSWD.Migrations
 
             modelBuilder.Entity("ProjectSWD.Data.Entities.Product", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("OrderItems");
 
                     b.Navigation("PromotionProducts");

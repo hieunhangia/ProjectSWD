@@ -23,8 +23,8 @@ namespace ProjectSWD.Data.Entities
         public string Address { get; set; } = string.Empty;
 
         public IdentityUser User { get; set; }
-        public ICollection<Order> Orders { get; set; } = new List<Order>();
-        public ICollection<Review> Reviews { get; set; } = new List<Review>();
-        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<Order> Orders { get; set; }
+        public ICollection<Review> Reviews { get; set; }
+        public ICollection<CartItem> CartItems { get; set; }
     }
 }

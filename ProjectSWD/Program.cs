@@ -14,7 +14,23 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>().AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+// Register Session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Register Repository and Service
+builder.Services.AddScoped<ProjectSWD.Repositories.IOrderRepository, ProjectSWD.Repositories.OrderRepository>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.IOrderService, ProjectSWD.Services.Customer.OrderService>();
+builder.Services.AddScoped<ProjectSWD.Repositories.ICartRepository, ProjectSWD.Repositories.CartRepository>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.ICartService, ProjectSWD.Services.Customer.CartService>();
+
 builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();
 builder.Services.AddScoped<ProjectSWD.Services.MockPaymentService>();
@@ -44,8 +60,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
+
 app.UseAuthorization();
 
+app.MapControllers();
 app.MapRazorPages();
 
 app.Run();

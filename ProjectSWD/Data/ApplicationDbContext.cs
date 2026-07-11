@@ -65,7 +65,8 @@ namespace ProjectSWD.Data
             {
                 typeof(Product).GetProperty("Quantity"),
                 typeof(OrderItem).GetProperty("Quantity"),
-                typeof(RefundItem).GetProperty("Quantity")
+                typeof(RefundItem).GetProperty("Quantity"),
+                typeof(CartItem).GetProperty("Quantity")
             };
 
             foreach (var prop in decimal10_2_Props)
@@ -112,6 +113,20 @@ namespace ProjectSWD.Data
             modelBuilder.Entity<Review>()
                 .HasIndex(r => new { r.CustomerId, r.OrderId, r.ProductId })
                 .IsUnique();
+            modelBuilder.Entity<CartItem>()
+                .HasKey(c => new { c.CustomerId, c.ProductId });
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(c => c.Customer)
+                .WithMany(cust => cust.CartItems)
+                .HasForeignKey(c => c.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade); 
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(c => c.Product)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(c => c.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
