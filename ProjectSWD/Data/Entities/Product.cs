@@ -8,10 +8,10 @@ namespace ProjectSWD.Data.Entities
         public int Id { get; set; }
         
         [MaxLength(255)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         
         [MaxLength(500)]
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
         
         public decimal Price { get; set; }
         public decimal Quantity { get; set; }
@@ -22,8 +22,9 @@ namespace ProjectSWD.Data.Entities
         public int UnitId { get; set; }
         public Unit Unit { get; set; }
 
-        public ICollection<OrderItem> OrderItems { get; set; }
-        public ICollection<PromotionProduct> PromotionProducts { get; set; }
-        public ICollection<RefundItem> RefundItems { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<PromotionProduct> PromotionProducts { get; set; } = new List<PromotionProduct>();
+        public ICollection<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }

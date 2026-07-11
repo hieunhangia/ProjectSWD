@@ -8,22 +8,23 @@ namespace ProjectSWD.Data.Entities
     public class Customer
     {
         [Key, ForeignKey("User")]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         
         [MaxLength(255)]
-        public string FullName { get; set; }
+        public string FullName { get; set; } = string.Empty;
         
         [MaxLength(255)]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         
         [MaxLength(20)]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
         
         [MaxLength(500)]
-        public string Address { get; set; }
+        public string Address { get; set; } = string.Empty;
 
         public IdentityUser User { get; set; }
-        public ICollection<Order> Orders { get; set; }
-        public ICollection<Review> Reviews { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }

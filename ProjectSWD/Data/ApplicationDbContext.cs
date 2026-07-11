@@ -24,6 +24,7 @@ namespace ProjectSWD.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Refund> Refunds { get; set; }
         public DbSet<RefundItem> RefundItems { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -82,6 +83,12 @@ namespace ProjectSWD.Data
 
             modelBuilder.Entity<RefundItem>()
                 .HasKey(ri => new { ri.RefundId, ri.ProductId });
+
+            modelBuilder.Entity<CartItem>()
+                .HasKey(ci => new { ci.CustomerId, ci.ProductId });
+
+            modelBuilder.Entity<CartItem>()
+                .Property(ci => ci.Quantity).HasColumnType("decimal(10, 2)");
 
 
             modelBuilder.Entity<Order>()
