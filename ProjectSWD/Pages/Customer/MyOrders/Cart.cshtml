@@ -1,4 +1,4 @@
-@model List<ProjectSWD.DTOs.CartItemDTO>
+﻿@model List<ProjectSWD.DTOs.CartItemDTO>
 @{
     ViewData["Title"] = "Giỏ Hàng Của Bạn";
     var totalAmount = Model.Sum(x => x.TotalPrice);
@@ -126,11 +126,11 @@
                             <i class="bi bi-info-circle me-1"></i> Phí vận chuyển và các tùy chọn thanh toán cụ thể sẽ được áp dụng tại bước tiếp theo.
                         </div>
                         <hr class="my-3" style="border-top: 1px solid #e2e8f0;">
-                        
+
                         <a href="/Checkout" class="btn btn-gradient btn-lg w-100 py-3 fw-bold-700 text-uppercase mb-3">
                             Tiến Hành Đặt Hàng <i class="bi bi-arrow-right-short ms-1 fs-5"></i>
                         </a>
-                        
+
                         <a href="/" class="btn btn-outline-gradient w-100 py-2.5 fw-semibold text-center text-decoration-none">
                             <i class="bi bi-arrow-left-short me-1 fs-5"></i> Tiếp tục mua sắm
                         </a>

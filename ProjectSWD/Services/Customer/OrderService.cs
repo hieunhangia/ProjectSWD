@@ -99,6 +99,7 @@ namespace ProjectSWD.Services.Customer
                 {
                     FullName = checkoutInfo.FullName,
                     PhoneNumber = checkoutInfo.PhoneNumber,
+                    Address = checkoutInfo.Address,
                     Time = DateTime.Now,
                     TotalPrice = productTotal + checkoutInfo.ShippingFee,
                     ApprovementStatus = OrderStatus.Processing,

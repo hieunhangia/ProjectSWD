@@ -14,7 +14,7 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
 {
     [Authorize]
     [Route("Checkout")]
-    public class CheckoutController(IOrderService orderService, ICartService cartService, ApplicationDbContext context) : Controller
+    public class Checkout(IOrderService orderService, ICartService cartService, ApplicationDbContext context) : Controller
     {
         private readonly IOrderService _orderService = orderService;
         private readonly ICartService _cartService = cartService;
@@ -30,8 +30,36 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
             }
 
             var cartItems = await _cartService.GetCartByCustomerIdAsync(userId);
-            
-            return View("~/Views/Checkout/Index.cshtml", cartItems);
+            if (cartItems == null || cartItems.Count == 0)
+            {
+                return Redirect("/Cart");
+            }
+
+            return View("~/Pages/Customer/MyOrders/Checkout.cshtml", cartItems);
+        }
+
+        [HttpGet("Success")]
+        public async Task<IActionResult> Success(int orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.Shipment)
+                .Include(o => o.Bill)
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == userId);
+
+            if (order == null)
+            {
+                return NotFound("Không tìm thấy đơn hàng.");
+            }
+
+            return View("~/Pages/Customer/MyOrders/CheckoutSuccess.cshtml", order);
         }
 
         [HttpPost("CalculateShipping")]

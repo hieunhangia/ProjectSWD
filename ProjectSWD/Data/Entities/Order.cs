@@ -16,6 +16,9 @@ namespace ProjectSWD.Data.Entities
         [MaxLength(20)]
         public string PhoneNumber { get; set; }
         
+        [MaxLength(500)]
+        public string Address { get; set; } = string.Empty;
+        
         public DateTime Time { get; set; }
         public decimal TotalPrice { get; set; }
         
