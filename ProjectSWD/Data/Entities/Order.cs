@@ -23,7 +23,10 @@ namespace ProjectSWD.Data.Entities
         public decimal TotalPrice { get; set; }
         
         public OrderStatus ApprovementStatus { get; set; }
-
+        
+        [MaxLength(50)]
+        public string Status { get; set; } = "Awaiting Confirmation";
+ 
         public string CustomerId { get; set; }
         public Customer Customer { get; set; }
 

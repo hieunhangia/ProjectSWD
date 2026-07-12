@@ -103,7 +103,8 @@ namespace ProjectSWD.Services.Customer
                     Time = DateTime.Now,
                     TotalPrice = productTotal + checkoutInfo.ShippingFee,
                     ApprovementStatus = OrderStatus.Processing,
-                    CustomerId = customer.Id
+                    CustomerId = customer.Id,
+                    Status = "Awaiting Confirmation"
                 };
 
                 await _orderRepository.AddOrderAsync(order);

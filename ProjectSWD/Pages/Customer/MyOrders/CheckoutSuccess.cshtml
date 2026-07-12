@@ -11,95 +11,118 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="container mt-5 mb-5">
+<div class="container mt-4 mb-5" style="max-width: 1000px;">
     <div class="row justify-content-center">
-        <div class="col-md-9 col-lg-8">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold-700 text-dark mb-1">Gia Hoa Phat System</h2>
+            <p class="text-muted">Hoàn tất đặt hàng nhanh chóng, an toàn và tiện lợi</p>
+        </div>
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="checkout-stepper mb-4">
+                <div class="stepper-item active">
+                    <div class="stepper-circle"><i class="bi bi-cart"></i></div>
+                    <div class="stepper-text">Giỏ Hàng</div>
+                </div>
+                <div class="stepper-item active">
+                    <div class="stepper-circle"><i class="bi bi-truck"></i></div>
+                    <div class="stepper-text">Giao Hàng & Thanh Toán</div>
+                </div>
+                <div class="stepper-item active">
+                    <div class="stepper-circle"><i class="bi bi-receipt"></i></div>
+                    <div class="stepper-text">Hoàn Thành</div>
+                </div>
+            </div>
+
             <div class="card invoice-card shadow-lg">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <div class="success-badge-pulse mb-3">
+                <div class="card-body p-4">
+                    <div class="text-center mb-3">
+                        <div class="success-badge-pulse mb-2" style="width: 60px; height: 60px; font-size: 2rem;">
                             <i class="bi bi-check-lg"></i>
                         </div>
-                        <h3 class="text-success fw-bold-700 mb-2">ĐẶT HÀNG THÀNH CÔNG!</h3>
-                        <p class="text-muted small">Cảm ơn bạn đã mua sắm tại Gia Hoa Phat System. Đơn hàng của bạn đã được tiếp nhận và đang xử lý.</p>
+                        <h4 class="text-success fw-bold-700 mb-1">ĐẶT HÀNG THÀNH CÔNG!</h4>
+                        <p class="text-muted small mb-0">Cảm ơn bạn đã mua sắm tại Gia Hoa Phat System. Đơn hàng đã được tiếp nhận.</p>
                     </div>
 
-                    <div class="bg-light rounded-3 p-4 mb-4 border shadow-2xs">
-                        <div class="row g-3">
+                    <div class="bg-light rounded-3 p-3 mb-3 border shadow-2xs" style="font-size: 0.85rem;">
+                        <div class="row g-2">
                             <div class="col-sm-6">
                                 <span class="text-muted d-block small fw-semibold text-uppercase tracking-wider">MÃ ĐƠN HÀNG</span>
-                                <strong class="fs-5 text-primary">#ORD-@Model.Id</strong>
+                                <strong class="text-primary">#ORD-@Model.Id</strong>
                             </div>
                             <div class="col-sm-6 text-sm-end">
                                 <span class="text-muted d-block small fw-semibold text-uppercase tracking-wider">THỜI GIAN ĐẶT</span>
                                 <strong class="text-dark">@Model.Time.ToString("dd/MM/yyyy HH:mm")</strong>
                             </div>
 
-                            <div class="col-12 my-2"><hr class="my-1"></div>
+                            <div class="col-12 my-1"><hr class="my-1"></div>
 
                             <div class="col-sm-6">
                                 <span class="text-muted d-block small fw-semibold text-uppercase tracking-wider">THÔNG TIN GIAO HÀNG</span>
                                 <strong class="text-dark">@Model.FullName</strong>
-                                <span class="d-block small text-muted mt-1"><i class="bi bi-telephone me-1"></i>SĐT: @Model.PhoneNumber</span>
-                                <span class="d-block small text-muted"><i class="bi bi-geo-alt me-1"></i>Địa chỉ: @Model.Address</span>
+                                <span class="d-block small text-muted mt-1"><i class="bi bi-telephone me-1"></i>@Model.PhoneNumber</span>
+                                <span class="d-block small text-muted"><i class="bi bi-geo-alt me-1"></i>@Model.Address</span>
                             </div>
                             <div class="col-sm-6 text-sm-end">
                                 <span class="text-muted d-block small fw-semibold text-uppercase tracking-wider">TRẠNG THÁI ĐƠN HÀNG</span>
                                 <strong class="text-dark">@Model.ApprovementStatus.ToString()</strong>
-                                <span class="d-block small text-success mt-1"><i class="bi bi-shield-check me-1"></i>Hệ thống đã ghi nhận</span>
+                                <span class="d-block small text-success mt-1"><i class="bi bi-shield-check me-1"></i>Đã ghi nhận</span>
                             </div>
                         </div>
                     </div>
 
-                    <h5 class="fw-bold-700 mb-3 text-dark"><i class="bi bi-card-checklist me-2 text-primary"></i>Sản phẩm đã mua</h5>
-                    <div class="table-responsive mb-4 border rounded">
-                        <table class="table align-middle mb-0">
-                            <thead class="table-light text-uppercase small">
+                    <h6 class="fw-bold-700 mb-2 text-dark"><i class="bi bi-card-checklist me-2 text-primary"></i>Sản phẩm đã mua</h6>
+                    <div class="table-responsive mb-3 border rounded">
+                        <table class="table table-sm align-middle mb-0" style="font-size: 0.8rem;">
+                            <thead class="table-light text-uppercase">
                                 <tr>
-                                    <th class="ps-3" style="font-size: 0.75rem;">Tên Sản Phẩm</th>
-                                    <th class="text-end" style="font-size: 0.75rem;">Đơn Giá</th>
-                                    <th class="text-center" style="font-size: 0.75rem;">SL</th>
-                                    <th class="text-end pe-3" style="font-size: 0.75rem;">Tổng</th>
+                                    <th class="ps-2 py-2" style="font-size: 0.7rem;">Sản Phẩm</th>
+                                    <th class="text-end py-2" style="font-size: 0.7rem;">Đơn Giá</th>
+                                    <th class="text-center py-2" style="font-size: 0.7rem;">SL</th>
+                                    <th class="text-end pe-2 py-2" style="font-size: 0.7rem;">Tổng</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var item in Model.OrderItems)
                                 {
                                     <tr>
-                                        <td class="ps-3">
-                                            <div class="fw-semibold-600 text-dark">@item.Product.Name</div>
-                                            <span class="text-muted small" style="font-size: 0.75rem;">Mã SP: #@item.ProductId</span>
+                                        <td class="ps-2 py-2">
+                                            <div class="fw-semibold text-dark text-truncate" style="max-width: 150px;">@item.Product.Name</div>
+                                            <span class="text-muted small d-block" style="font-size: 0.65rem;">Mã SP: #@item.ProductId</span>
                                         </td>
-                                        <td class="text-end">@item.Price.ToString("N0") đ</td>
-                                        <td class="text-center font-monospace">@item.Quantity.ToString("G29")</td>
-                                        <td class="text-end pe-3 fw-bold text-dark">@((item.Price * item.Quantity).ToString("N0")) đ</td>
+                                        <td class="text-end py-2">@item.Price.ToString("N0") đ</td>
+                                        <td class="text-center font-monospace py-2">@item.Quantity.ToString("G29")</td>
+                                        <td class="text-end pe-2 fw-bold text-dark py-2">@((item.Price * item.Quantity).ToString("N0")) đ</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="row justify-content-end mb-4">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="d-flex justify-content-between mb-2 small">
+                    <div class="row justify-content-end mb-3">
+                        <div class="col-md-8 col-lg-7">
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.8rem;">
                                 <span class="text-muted">Tiền hàng:</span>
                                 <span class="fw-semibold text-dark">@subtotal.ToString("N0") đ</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2 small">
-                                <span class="text-muted">Phí vận chuyển:</span>
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.8rem;">
+                                <span class="text-muted">Phí ship:</span>
                                 <span class="fw-semibold text-dark">@shippingFee.ToString("N0") đ</span>
                             </div>
-                            <hr class="my-2">
+                            <hr class="my-1">
                             <div class="d-flex justify-content-between align-items-baseline">
-                                <span class="fs-6 fw-bold text-dark">Tổng thanh toán:</span>
-                                <span class="fs-5 fw-bold text-primary">@Model.TotalPrice.ToString("N0") đ</span>
+                                <span class="fw-bold text-dark" style="font-size: 0.85rem;">Tổng thanh toán:</span>
+                                <span class="fw-bold text-primary" style="font-size: 1.1rem;">@Model.TotalPrice.ToString("N0") đ</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="text-center">
-                        <a href="/" class="btn btn-gradient btn-lg px-5 py-3">
-                            <i class="bi bi-house-door me-2"></i> Quay lại trang chủ
+                    <div class="text-center d-flex justify-content-center gap-2 mt-2">
+                        <a href="/" class="btn btn-outline-secondary btn-sm px-3 py-2" style="border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; height: 42px; font-size: 0.85rem;">
+                            <i class="bi bi-house-door me-1"></i> Trang chủ
+                        </a>
+                        <a href="/OrderHistory" class="btn btn-gradient btn-sm px-3 py-2" style="height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem;">
+                            <i class="bi bi-clock-history me-1"></i> Lịch sử đơn hàng
                         </a>
                     </div>
                 </div>
@@ -175,22 +198,78 @@
         animation: pulse 2s infinite;
     }
 
-    @@keyframes pulse {
-        0% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-        }
-        70% {
-            transform: scale(1);
-            box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
-        }
-        100% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-        }
-    }
 
     .shadow-2xs {
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .checkout-stepper {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto 2.5rem auto;
+    }
+
+        .checkout-stepper::before {
+            content: "";
+            position: absolute;
+            top: 24px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e2e8f0;
+            z-index: 1;
+        }
+
+    .stepper-item {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: calc(100% / 3);
+    }
+
+    .stepper-circle {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 4px solid #e2e8f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .stepper-item.active .stepper-circle {
+        background: #1e3c72;
+        border-color: #fff;
+        color: #fff;
+        box-shadow: 0 10px 15px -3px rgba(30, 60, 114, 0.3);
+    }
+
+    .stepper-item.completed .stepper-circle {
+        background-color: #10b981;
+        border-color: #fff;
+        color: #fff;
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+    }
+
+    .stepper-text {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: color 0.3s ease;
+    }
+
+    .stepper-item.active .stepper-text {
+        color: #1e3c72;
     }
 </style>
