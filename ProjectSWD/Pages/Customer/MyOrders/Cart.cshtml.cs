@@ -33,6 +33,29 @@ namespace ProjectSWD.Controllers.Customer
             return View("~/Pages/Customer/MyOrders/Cart.cshtml", cartItems);
         }
 
+        [HttpPost("AddToCart")]
+        public async Task<IActionResult> AddToCart(int productId, decimal quantity)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            try
+            {
+                await _cartService.AddToCartAsync(userId, productId, quantity);
+                TempData["SuccessMessage"] = "Đã thêm sản phẩm vào giỏ hàng!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            var referer = Request.Headers.Referer.ToString();
+            return Redirect(string.IsNullOrEmpty(referer) ? "/" : referer);
+        }
+
         [HttpPost("UpdateQuantity")]
         public async Task<IActionResult> UpdateQuantity(int productId, decimal quantity)
         {

@@ -1,0 +1,140 @@
+@page "/Product/{id:int}"
+@model ProjectSWD.Pages.ProductDetailModel
+@{
+    ViewData["Title"] = Model.Product?.Name ?? "Chi tiết sản phẩm";
+}
+
+@if (Model.LoadError != null)
+{
+    <div class="alert alert-danger" role="alert">
+        Hiện không thể tải thông tin sản phẩm. Vui lòng tải lại trang hoặc thử lại sau.
+    </div>
+    <a href="/" class="btn btn-outline-dark">← Về trang chủ</a>
+}
+else
+{
+    var product = Model.Product!;
+    var hasDiscount = Model.DiscountPercent.HasValue;
+    var percent = Model.DiscountPercent ?? 0;
+    var salePrice = hasDiscount ? Math.Round(product.Price * (1 - percent / 100m), 0) : product.Price;
+    var outOfStock = product.Quantity <= 0;
+    var roundedStars = (int)Math.Round(Model.AvgRating);
+
+    if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="mb-3">
+        <a href="/" class="text-decoration-none">← Về trang chủ</a>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-5">
+            <img src="@product.ImageUrl" class="img-fluid rounded bg-light w-100" alt="@product.Name"
+                 style="object-fit: cover;"
+                 onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22450%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3ede4%22/><text x=%2250%25%22 y=%2250%25%22 font-size=%2296%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🧁</text></svg>';" />
+        </div>
+
+        <div class="col-md-7">
+            <span class="badge bg-light text-dark border mb-2">@product.Category?.Name</span>
+            <h2>@product.Name</h2>
+
+            <div class="mb-3">
+                @if (Model.ReviewCount > 0)
+                {
+                    <span class="text-warning">
+                        @for (var i = 1; i <= 5; i++)
+                        {
+                            @(i <= roundedStars ? "★" : "☆")
+                        }
+                    </span>
+                    <span class="text-muted ms-1">@Model.AvgRating.ToString("0.#") (@Model.ReviewCount đánh giá)</span>
+                }
+                else
+                {
+                    <span class="text-muted">Chưa có đánh giá</span>
+                }
+            </div>
+
+            <div class="mb-3">
+                @if (hasDiscount)
+                {
+                    <span class="fw-bold text-danger fs-3">@salePrice.ToString("N0")đ</span>
+                    <span class="text-muted text-decoration-line-through ms-2">@product.Price.ToString("N0")đ</span>
+                    <span class="badge bg-danger ms-2">-@percent.ToString("0")%</span>
+                }
+                else
+                {
+                    <span class="fw-bold fs-3">@product.Price.ToString("N0")đ</span>
+                }
+                <span class="text-muted">/ @product.Unit?.Name</span>
+            </div>
+
+            <div class="mb-4">
+                @if (!outOfStock)
+                {
+                    <span class="badge bg-success">Còn hàng</span>
+                    <span class="text-muted ms-2">Còn lại: @product.Quantity.ToString("0.##") @product.Unit?.Name</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Hết hàng</span>
+                }
+            </div>
+
+            <form method="post" action="/Cart/AddToCart" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="productId" value="@product.Id" />
+                <input type="number" name="quantity" value="1"
+                       min="@(product.Unit?.AllowsDecimal == true ? "0.1" : "1")"
+                       step="@(product.Unit?.AllowsDecimal == true ? "0.1" : "1")"
+                       max="@product.Quantity"
+                       class="form-control" style="width: 110px;"
+                       @(outOfStock ? "disabled" : "") />
+                <button type="submit" class="btn btn-primary" @(outOfStock ? "disabled" : "")>
+                    🛒 Thêm vào giỏ hàng
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Đánh giá sản phẩm (@Model.ReviewCount)</h4>
+
+    if (Model.Reviews.Count == 0)
+    {
+        <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var review in Model.Reviews)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="fw-bold">@(review.Customer?.FullName ?? "Khách hàng")</span>
+                            <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy")</small>
+                        </div>
+                        <div class="text-warning mb-2">
+                            @for (var i = 1; i <= 5; i++)
+                            {
+                                @(i <= review.Rating ? "★" : "☆")
+                            }
+                        </div>
+                        <p class="mb-0">@review.Content</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
