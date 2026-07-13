@@ -7,14 +7,12 @@ using ProjectSWD.Data;
 using ProjectSWD.Data.Entities;
 using ProjectSWD.Data.Enums;
 using ProjectSWD.DTOs;
-using ProjectSWD.Repositories;
 
 namespace ProjectSWD.Services.Customer
 {
-    public class OrderService(ApplicationDbContext context, IOrderRepository orderRepository) : IOrderService
+    public class OrderService(ApplicationDbContext context) : IOrderService
     {
         private readonly ApplicationDbContext _context = context;
-        private readonly IOrderRepository _orderRepository = orderRepository;
 
         public Task<decimal> CalculateShippingFeeAsync(string address)
         {
@@ -116,8 +114,8 @@ namespace ProjectSWD.Services.Customer
                     Status = "Awaiting Confirmation"
                 };
 
-                await _orderRepository.AddOrderAsync(order);
-                await _orderRepository.SaveChangesAsync();
+                await _context.Orders.AddAsync(order);
+                await _context.SaveChangesAsync();
 
                 foreach (var item in cartItems)
                 {
@@ -128,7 +126,7 @@ namespace ProjectSWD.Services.Customer
                         Quantity = item.Quantity,
                         Price = item.Product?.Price ?? 0
                     };
-                    await _orderRepository.AddOrderItemAsync(orderItem);
+                    await _context.OrderItems.AddAsync(orderItem);
                 }
 
                 var deliveryPartner = await _context.DeliveryPartners.FirstOrDefaultAsync();
@@ -161,10 +159,16 @@ namespace ProjectSWD.Services.Customer
                 }
                 else
                 {
-                    await _orderRepository.ClearCartAsync(userId);
+                    var cartItemsToRemove = await _context.CartItems
+                        .Where(c => c.CustomerId == userId)
+                        .ToListAsync();
+                    if (cartItemsToRemove.Count > 0)
+                    {
+                        _context.CartItems.RemoveRange(cartItemsToRemove);
+                    }
                 }
 
-                await _orderRepository.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return new OrderSummaryDTO
