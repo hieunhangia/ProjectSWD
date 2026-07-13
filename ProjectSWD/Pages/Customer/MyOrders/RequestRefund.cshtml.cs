@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjectSWD.Services.Customer;
+using ProjectSWD.DTOs.Refund;
 
 namespace ProjectSWD.Pages.Customer.MyOrders
 {
@@ -77,7 +78,15 @@ namespace ProjectSWD.Pages.Customer.MyOrders
 
             try
             {
-                await _refundService.CreateRefundRequestAsync(OrderId, userId, Reason, ProductId, Quantity);
+                var requestDto = new CreateRefundRequestDTO
+                {
+                    OrderId = OrderId,
+                    CustomerId = userId,
+                    Reason = Reason,
+                    ProductId = ProductId,
+                    Quantity = Quantity
+                };
+                await _refundService.CreateRefundRequestAsync(requestDto);
                 TempData["SuccessMessage"] = "Gửi yêu cầu hoàn tiền thành công.";
                 return Page();
             }
@@ -93,17 +102,18 @@ namespace ProjectSWD.Pages.Customer.MyOrders
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId != null)
             {
-                EligibilityError = await _refundService.ValidateRefundEligibilityAsync(userId, OrderId, ProductId);
+                var eligibilityResponse = await _refundService.ValidateRefundEligibilityAsync(userId, OrderId, ProductId);
+                EligibilityError = eligibilityResponse.ErrorMessage;
 
                 if (string.IsNullOrEmpty(EligibilityError))
                 {
                     var productInfo = await _refundService.GetProductInfoForRefundAsync(userId, OrderId, ProductId);
-                    if (productInfo.HasValue)
+                    if (productInfo != null)
                     {
-                        ProductName = productInfo.Value.Name;
-                        ProductImage = productInfo.Value.ImageUrl;
-                        MaxQuantity = productInfo.Value.MaxQuantity;
-                        Price = productInfo.Value.Price;
+                        ProductName = productInfo.Name;
+                        ProductImage = productInfo.ImageUrl;
+                        MaxQuantity = productInfo.MaxQuantity;
+                        Price = productInfo.Price;
                     }
                 }
             }
