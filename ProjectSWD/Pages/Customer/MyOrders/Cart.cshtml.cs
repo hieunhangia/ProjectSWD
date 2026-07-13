@@ -68,7 +68,6 @@ namespace ProjectSWD.Controllers.Customer
             try
             {
                 await _cartService.UpdateQuantityAsync(userId, productId, quantity);
-                TempData["SuccessMessage"] = "Cập nhật số lượng thành công!";
             }
             catch (Exception ex)
             {
@@ -90,7 +89,6 @@ namespace ProjectSWD.Controllers.Customer
             try
             {
                 await _cartService.RemoveFromCartAsync(userId, productId);
-                TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
             }
             catch (Exception ex)
             {

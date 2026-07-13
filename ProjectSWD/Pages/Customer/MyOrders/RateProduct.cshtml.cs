@@ -25,13 +25,13 @@ namespace ProjectSWD.Pages.Customer.MyOrders
         [BindProperty(SupportsGet = true)] public int ProductId { get; set; }
 
         [BindProperty]
-        [Required(ErrorMessage = "Please select a star rating.")]
-        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5.")]
+        [Required(ErrorMessage = "Vui lòng chọn số sao đánh giá.")]
+        [Range(1, 5, ErrorMessage = "Điểm đánh giá phải từ 1 đến 5.")]
         public int Rating { get; set; }
 
         [BindProperty]
-        [Required(ErrorMessage = "Please write a review.")]
-        [StringLength(2000, ErrorMessage = "Review cannot exceed 2000 characters.")]
+        [Required(ErrorMessage = "Vui lòng nhập nội dung đánh giá.")]
+        [StringLength(2000, ErrorMessage = "Nội dung đánh giá không được vượt quá 2000 ký tự.")]
         public string Content { get; set; }
 
         public string ProductName { get; set; }
@@ -90,6 +90,10 @@ namespace ProjectSWD.Pages.Customer.MyOrders
             if (userId != null)
             {
                 EligibilityError = await _feedbackService.ValidateFeedbackEligibilityAsync(userId, OrderId, ProductId);
+            }
+            else
+            {
+                EligibilityError = "Bạn cần đăng nhập để thực hiện hành động này.";
             }
 
             var productInfo = await _feedbackService.GetProductInfoForRatingAsync(ProductId);

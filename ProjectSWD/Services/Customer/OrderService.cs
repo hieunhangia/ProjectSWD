@@ -37,14 +37,23 @@ namespace ProjectSWD.Services.Customer
         }
         public async Task<OrderSummaryDTO> ProcessOrderCheckoutAsync(string userId, OrderCheckoutDTO checkoutInfo)
         {
-            var cartItems = await _context.CartItems
-                .Where(c => c.CustomerId == userId)
+            var query = _context.CartItems.AsQueryable();
+            if (checkoutInfo.ProductIds != null && checkoutInfo.ProductIds.Count > 0)
+            {
+                query = query.Where(c => c.CustomerId == userId && checkoutInfo.ProductIds.Contains(c.ProductId));
+            }
+            else
+            {
+                query = query.Where(c => c.CustomerId == userId);
+            }
+
+            var cartItems = await query
                 .Include(c => c.Product)
                 .ToListAsync();
 
             if (cartItems == null || cartItems.Count == 0)
             {
-                throw new ArgumentException("Giỏ hàng của bạn đang trống.");
+                throw new ArgumentException("Giỏ hàng của bạn đang trống hoặc không tìm thấy sản phẩm yêu cầu.");
             }
 
             var cartItemsDTO = cartItems.Select(item => new CartItemDTO
@@ -144,7 +153,16 @@ namespace ProjectSWD.Services.Customer
                 };
                 await _context.Bills.AddAsync(bill);
 
-                await _orderRepository.ClearCartAsync(userId);
+                if (checkoutInfo.ProductIds != null && checkoutInfo.ProductIds.Count > 0)
+                {
+                    var itemsToRemove = _context.CartItems
+                        .Where(c => c.CustomerId == userId && checkoutInfo.ProductIds.Contains(c.ProductId));
+                    _context.CartItems.RemoveRange(itemsToRemove);
+                }
+                else
+                {
+                    await _orderRepository.ClearCartAsync(userId);
+                }
 
                 await _orderRepository.SaveChangesAsync();
                 await transaction.CommitAsync();

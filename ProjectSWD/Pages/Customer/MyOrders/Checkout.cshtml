@@ -23,7 +23,7 @@
 <div class="container mt-4 mb-5" style="max-width: 1000px;">
     <div><a href="/Cart"> Quay lại</a></div>
     <div class="text-center mb-4">
-        <h2 class="fw-bold-700 text-dark mb-1">Gia Hoa Phat System</h2>
+        <h2 class="fw-bold-700 text-dark mb-1">Hệ thống Gia Hòa Phát</h2>
         <p class="text-muted">Hoàn tất đặt hàng nhanh chóng, an toàn và tiện lợi</p>
     </div>
 
@@ -158,12 +158,10 @@
                         </div>
                     </div>
 
-                    <!-- Khối QR Chuyển Khoản (Sẽ được ẩn/hiện động) -->
                     <div id="transferQrSection" class="d-none mt-4 p-4 border rounded-3 bg-light text-center shadow-2xs">
                         <h6 class="fw-bold text-dark mb-3"><i class="bi bi-qr-code-scan me-2 text-primary"></i>Quét mã QR để chuyển khoản thanh toán</h6>
 
                         <div id="qrImageContainer" class="mb-3 d-inline-block p-3 bg-white border rounded shadow-3xs">
-                            <!-- Ảnh QR VietQR sẽ được nạp động tại đây -->
                             <img id="vietQrImage" src="" alt="Mã VietQR Thanh Toán" class="img-fluid animate-fade-in" style="max-height: 280px; width: auto;" />
                         </div>
 
@@ -219,7 +217,6 @@
 
 <script>
     function initCheckout() {
-        // DOM Elements
         const addressInput = document.getElementById("address");
         const btnCalculateShipping = document.getElementById("btnCalculateShipping");
         const summaryShippingFee = document.getElementById("summaryShippingFee");
@@ -228,16 +225,13 @@
         const checkoutForm = document.getElementById("checkoutForm");
         const validationErrorMessage = document.getElementById("validationErrorMessage");
 
-        // Overlays
         const loadingOverlay = document.getElementById("loadingOverlay");
         const loadingText = document.getElementById("loadingText");
 
-        // Grid Panels
         const checkoutMainSection = document.getElementById("checkoutMainSection");
         const checkoutSummarySection = document.getElementById("checkoutSummarySection");
         const successReceiptSection = document.getElementById("successReceiptSection");
 
-        // Receipt Elements
         const receiptOrderId = document.getElementById("receiptOrderId");
         const receiptOrderDate = document.getElementById("receiptOrderDate");
         const receiptFullName = document.getElementById("receiptFullName");
@@ -249,7 +243,6 @@
         const receiptShippingFee = document.getElementById("receiptShippingFee");
         const receiptGrandTotal = document.getElementById("receiptGrandTotal");
 
-        // VietQR QR Box Elements
         const transferQrSection = document.getElementById("transferQrSection");
         const vietQrImage = document.getElementById("vietQrImage");
         const qrImageContainer = document.getElementById("qrImageContainer");
@@ -257,16 +250,13 @@
         const btnVerifyPayment = document.getElementById("btnVerifyPayment");
         const paymentStatusLabel = document.getElementById("paymentStatusLabel");
 
-        // Cart Calculations Values
         const cartSubtotal = parseFloat("@subtotal.ToString("F0", System.Globalization.CultureInfo.InvariantCulture)");
         let calculatedShippingFee = 0;
         let hasCalculatedShipping = false;
 
-        // Generate Temporary Order ID once per page load for VietQR description
         const tempOrderId = "GHP" + Math.floor(100000 + Math.random() * 900000);
         let isTransferPaid = false;
 
-        // Payment selection card toggle handler
         document.querySelectorAll('.payment-card').forEach(card => {
             card.addEventListener('click', function() {
                 const radioId = this.getAttribute('data-id');
@@ -318,7 +308,6 @@
             vietQrImage.src = qrUrl;
         }
 
-        // Verify Payment button handler
         if (btnVerifyPayment) {
             btnVerifyPayment.addEventListener("click", function() {
                 btnVerifyPayment.disabled = true;
@@ -364,7 +353,6 @@
 
             showLoading("Đang tính phí vận chuyển từ địa chỉ...");
 
-            // Call AJAX calculate shipping fee
             fetch("/Checkout/CalculateShipping", {
                 method: "POST",
                 headers: {
@@ -400,7 +388,6 @@
             });
         }
 
-        // Submit Order on Click
         if (btnSubmitOrder) {
             btnSubmitOrder.addEventListener("click", function () {
                 if (btnSubmitOrder.disabled) return;
@@ -426,11 +413,9 @@
                 const phoneNumber = document.getElementById("phoneNumber").value.trim();
                 const address = addressInput.value.trim();
 
-                // Disable submit button to prevent double-clicks
                 btnSubmitOrder.disabled = true;
                 showLoading("Đang kết nối cổng thanh toán...");
 
-                // Submit Order AJAX Call
                 fetch("/Checkout/SubmitOrder", {
                     method: "POST",
                     headers: {
@@ -441,14 +426,14 @@
                         phoneNumber: phoneNumber,
                         address: address,
                         paymentMethod: selectedMethod,
-                        shippingFee: calculatedShippingFee
+                        shippingFee: calculatedShippingFee,
+                        productIds: @Html.Raw(Json.Serialize(Model.Select(x => x.ProductId).ToList()))
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     hideLoading();
                     if (data.success) {
-                        // Redirect to the success receipt page
                         window.location.href = `/Checkout/Success?orderId=${data.data.orderId}`;
                     } else {
                         btnSubmitOrder.disabled = false;
@@ -464,7 +449,6 @@
             });
         }
 
-        // Utilities
         function showLoading(text) {
             loadingText.innerText = text;
             loadingOverlay.classList.remove("d-none");
@@ -485,7 +469,6 @@
         }
 
         function showReceipt(orderSummary) {
-            // Populate receipt text fields
             receiptOrderId.innerText = "#ORD-" + orderSummary.orderId;
             receiptOrderDate.innerText = formatDate(orderSummary.orderTime);
             receiptFullName.innerText = orderSummary.fullName;
@@ -500,7 +483,6 @@
             }
             receiptPaymentMethod.innerText = payMethodName;
 
-            // Populate receipt items list
             receiptItemsBody.innerHTML = "";
             orderSummary.items.forEach(item => {
                 const row = `
@@ -517,12 +499,10 @@
                 receiptItemsBody.insertAdjacentHTML('beforeend', row);
             });
 
-            // Set totals
             receiptSubtotal.innerText = formatCurrency(orderSummary.productTotal) + " đ";
             receiptShippingFee.innerText = formatCurrency(orderSummary.shippingFee) + " đ";
             receiptGrandTotal.innerText = formatCurrency(orderSummary.totalPrice) + " đ";
 
-            // Swap displays
             checkoutMainSection.classList.add("d-none");
             if (checkoutSummarySection) {
                 checkoutSummarySection.classList.add("d-none");

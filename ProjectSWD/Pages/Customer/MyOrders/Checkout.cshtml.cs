@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +22,7 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
         private readonly ApplicationDbContext _context = context;
 
         [HttpGet("")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] string? productIds)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -30,6 +31,21 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
             }
 
             var cartItems = await _cartService.GetCartByCustomerIdAsync(userId);
+            if (!string.IsNullOrEmpty(productIds))
+            {
+                try
+                {
+                    var idList = productIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                           .Select(int.Parse)
+                                           .ToList();
+                    cartItems = cartItems.Where(item => idList.Contains(item.ProductId)).ToList();
+                }
+                catch
+                {
+                    // Ignore parsing errors and show full cart or redirect
+                }
+            }
+
             if (cartItems == null || cartItems.Count == 0)
             {
                 return Redirect("/Cart");

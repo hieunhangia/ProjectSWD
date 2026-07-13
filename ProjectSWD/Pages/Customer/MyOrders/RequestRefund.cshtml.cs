@@ -23,13 +23,13 @@ namespace ProjectSWD.Pages.Customer.MyOrders
         [BindProperty(SupportsGet = true)] public int ProductId { get; set; }
 
         [BindProperty]
-        [Required(ErrorMessage = "Please provide a reason for the refund.")]
+        [Required(ErrorMessage = "Vui lòng nhập lý do hoàn tiền.")]
         [MaxLength(1000)]
         public string Reason { get; set; }
 
         [BindProperty]
-        [Required(ErrorMessage = "Please enter the quantity.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Quantity must be greater than 0.")]
+        [Required(ErrorMessage = "Vui lòng nhập số lượng.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
         public decimal Quantity { get; set; }
 
         public string ProductName { get; set; }
@@ -65,7 +65,7 @@ namespace ProjectSWD.Pages.Customer.MyOrders
 
             if (Quantity > MaxQuantity)
             {
-                ModelState.AddModelError("Quantity", $"Quantity cannot exceed {MaxQuantity}.");
+                ModelState.AddModelError("Quantity", $"Số lượng không thể vượt quá {MaxQuantity}.");
                 return Page();
             }
 
@@ -78,7 +78,7 @@ namespace ProjectSWD.Pages.Customer.MyOrders
             try
             {
                 await _refundService.CreateRefundRequestAsync(OrderId, userId, Reason, ProductId, Quantity);
-                TempData["SuccessMessage"] = "Refund request submitted successfully.";
+                TempData["SuccessMessage"] = "Gửi yêu cầu hoàn tiền thành công.";
                 return Page();
             }
             catch (Exception ex)
@@ -109,7 +109,7 @@ namespace ProjectSWD.Pages.Customer.MyOrders
             }
             else
             {
-                EligibilityError = "You need to log in to perform this action.";
+                EligibilityError = "Bạn cần đăng nhập để thực hiện hành động này.";
             }
         }
     }

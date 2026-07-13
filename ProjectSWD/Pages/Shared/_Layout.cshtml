@@ -12,7 +12,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">ProjectSWD</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Gia Hoa Phat System</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,15 +22,45 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Cart">Giỏ Hàng</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/OrderHistory">Lịch sử đơn hàng</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/Admin/Promotion">Quản lý Khuyến Mãi</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/Admin/Refunds">Quản lý Hoàn Tiền</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/Admin/Revenue">Báo cáo Doanh Thu</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Staff"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/Staff/Profile">Hồ sơ Nhân Viên</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/Cart">Giỏ Hàng</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" href="/OrderHistory">Lịch sử đơn hàng</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Cart">Giỏ Hàng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/OrderHistory">Lịch sử đơn hàng</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

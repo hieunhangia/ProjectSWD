@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProjectSWD.DTOs
@@ -21,5 +22,7 @@ namespace ProjectSWD.DTOs
         public string PaymentMethod { get; set; } = "COD"; // E.g., COD, CreditCard, BankTransfer
 
         public decimal ShippingFee { get; set; }
+
+        public List<int> ProductIds { get; set; } = new();
     }
 }
