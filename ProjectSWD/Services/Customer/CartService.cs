@@ -6,18 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSWD.Data;
 using ProjectSWD.Data.Entities;
 using ProjectSWD.DTOs;
-using ProjectSWD.Repositories;
 
 namespace ProjectSWD.Services.Customer
 {
-    public class CartService(ICartRepository cartRepository, ApplicationDbContext context) : ICartService
+    public class CartService(ApplicationDbContext context) : ICartService
     {
-        private readonly ICartRepository _cartRepository = cartRepository;
         private readonly ApplicationDbContext _context = context;
 
         public async Task<List<CartItemDTO>> GetCartByCustomerIdAsync(string customerId)
         {
-            var items = await _cartRepository.GetCartItemsByCustomerIdAsync(customerId);
+            var items = await _context.CartItems
+                .Where(c => c.CustomerId == customerId)
+                .Include(c => c.Product)
+                .ToListAsync();
             return items.Select(item => new CartItemDTO
             {
                 ProductId = item.ProductId,
@@ -42,7 +43,9 @@ namespace ProjectSWD.Services.Customer
                 throw new KeyNotFoundException("Sản phẩm không tồn tại.");
             }
 
-            var existingItem = await _cartRepository.GetCartItemAsync(customerId, productId);
+            var existingItem = await _context.CartItems
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.CustomerId == customerId && c.ProductId == productId);
             decimal newQuantity = quantity;
 
             if (existingItem != null)
@@ -58,7 +61,7 @@ namespace ProjectSWD.Services.Customer
             if (existingItem != null)
             {
                 existingItem.Quantity = newQuantity;
-                await _cartRepository.UpdateCartItemAsync(existingItem);
+                _context.CartItems.Update(existingItem);
             }
             else
             {
@@ -68,10 +71,10 @@ namespace ProjectSWD.Services.Customer
                     ProductId = productId,
                     Quantity = quantity
                 };
-                await _cartRepository.AddCartItemAsync(newItem);
+                await _context.CartItems.AddAsync(newItem);
             }
 
-            await _cartRepository.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateQuantityAsync(string customerId, int productId, decimal quantity)
@@ -81,7 +84,9 @@ namespace ProjectSWD.Services.Customer
                 throw new ArgumentException("Số lượng không được âm.");
             }
 
-            var existingItem = await _cartRepository.GetCartItemAsync(customerId, productId);
+            var existingItem = await _context.CartItems
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.CustomerId == customerId && c.ProductId == productId);
             if (existingItem == null)
             {
                 throw new KeyNotFoundException("Sản phẩm chưa có trong giỏ hàng.");
@@ -89,7 +94,7 @@ namespace ProjectSWD.Services.Customer
 
             if (quantity == 0)
             {
-                await _cartRepository.DeleteCartItemAsync(existingItem);
+                _context.CartItems.Remove(existingItem);
             }
             else
             {
@@ -105,26 +110,34 @@ namespace ProjectSWD.Services.Customer
                 }
 
                 existingItem.Quantity = quantity;
-                await _cartRepository.UpdateCartItemAsync(existingItem);
+                _context.CartItems.Update(existingItem);
             }
 
-            await _cartRepository.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task RemoveFromCartAsync(string customerId, int productId)
         {
-            var existingItem = await _cartRepository.GetCartItemAsync(customerId, productId);
+            var existingItem = await _context.CartItems
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.CustomerId == customerId && c.ProductId == productId);
             if (existingItem != null)
             {
-                await _cartRepository.DeleteCartItemAsync(existingItem);
-                await _cartRepository.SaveChangesAsync();
+                _context.CartItems.Remove(existingItem);
+                await _context.SaveChangesAsync();
             }
         }
 
         public async Task ClearCartAsync(string customerId)
         {
-            await _cartRepository.ClearCartAsync(customerId);
-            await _cartRepository.SaveChangesAsync();
+            var cartItems = await _context.CartItems
+                .Where(c => c.CustomerId == customerId)
+                .ToListAsync();
+            if (cartItems.Count > 0)
+            {
+                _context.CartItems.RemoveRange(cartItems);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

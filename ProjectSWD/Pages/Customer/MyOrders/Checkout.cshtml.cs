@@ -42,7 +42,6 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
                 }
                 catch
                 {
-                    // Ignore parsing errors and show full cart or redirect
                 }
             }
 
