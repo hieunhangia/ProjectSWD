@@ -103,6 +103,20 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
             if (currentIndex >= 0 && currentIndex < StatusSteps.Count - 1)
             {
                 order.Status = StatusSteps[currentIndex + 1];
+                
+                if (order.Status == "Confirmed")
+                {
+                    order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Confirmed;
+                }
+                else if (order.Status == "In Transit")
+                {
+                    order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Confirmed;
+                }
+                else if (order.Status == "Delivered Successfully")
+                {
+                    order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Delivered;
+                }
+
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, newStatus = order.Status, statusCode = GetStatusCode(order.Status) });
             }
@@ -134,6 +148,7 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
             if (currentStatus == "Awaiting Confirmation")
             {
                 order.Status = "Cancelled";
+                order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Cancelled;
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, newStatus = "Cancelled", statusCode = 0 });
             }

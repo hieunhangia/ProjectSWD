@@ -1,4 +1,4 @@
-﻿@model ProjectSWD.Data.Entities.Order
+@model ProjectSWD.Data.Entities.Order
 @{
     ViewData["Title"] = "Chi Tiết Đơn Hàng #" + Model.Id;
     var subtotal = Model.OrderItems.Sum(oi => oi.Price * oi.Quantity);
@@ -184,7 +184,20 @@
                                                     <div class="d-flex align-items-center">
                                                         <div>
                                                             <div class="fw-semibold text-dark">@(item.Product?.Name ?? "Sản phẩm")</div>
-                                                            <span class="text-muted small" style="font-size: 0.75rem;">Mã: #@item.ProductId</span>
+                                                            <div class="mt-1">
+                                                                <span class="text-muted small" style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Mã: #@item.ProductId</span>
+                                                                @if (Model.Status == "Delivered Successfully")
+                                                                {
+                                                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                                                        <a href="/Customer/MyOrders/RateProduct/@Model.Id/@item.ProductId" class="badge bg-primary-subtle text-primary border-0 text-decoration-none" style="font-size: 0.7rem; font-weight: 600; padding: 4px 8px;">
+                                                                            <i class="bi bi-star-fill me-1"></i>Đánh giá
+                                                                        </a>
+                                                                        <a href="/Customer/MyOrders/RequestRefund/@Model.Id/@item.ProductId" class="badge bg-danger-subtle text-danger border-0 text-decoration-none" style="font-size: 0.7rem; font-weight: 600; padding: 4px 8px;">
+                                                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Hoàn tiền
+                                                                        </a>
+                                                                    </div>
+                                                                }
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -324,10 +337,15 @@
             icon.classList.remove("d-none");
             btn.disabled = false;
 
-            if (data.success) {
-                // Update UI timeline and buttons based on new status
-                updateUI(data.newStatus, data.statusCode);
-            } else {
+             if (data.success) {
+                 // Update UI timeline and buttons based on new status
+                 updateUI(data.newStatus, data.statusCode);
+                 if (data.newStatus === "Delivered Successfully") {
+                     setTimeout(() => {
+                         location.reload();
+                     }, 500);
+                 }
+             } else {
                 alert(data.message || "Không thể cập nhật trạng thái.");
             }
         })

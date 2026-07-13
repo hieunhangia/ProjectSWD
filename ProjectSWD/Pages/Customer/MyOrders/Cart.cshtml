@@ -12,7 +12,7 @@
 
 <div class="container mt-4 mb-5" style="max-width: 1000px;">
     <div class="text-center mb-4">
-        <h2 class="fw-bold-700 text-dark mb-1">Gia Hoa Phat System</h2>
+        <h2 class="fw-bold-700 text-dark mb-1">Hệ thống Gia Hòa Phát</h2>
         <p class="text-muted">Quản lý các sản phẩm bạn đã chọn trước khi thanh toán</p>
     </div>
 
@@ -61,7 +61,10 @@
                             <table class="table table-sm align-middle cart-table mb-0" style="font-size: 0.85rem;">
                                 <thead>
                                     <tr>
-                                        <th class="ps-4">Sản Phẩm</th>
+                                        <th class="ps-4 text-center" style="width: 50px;">
+                                            <input type="checkbox" id="selectAllCheckbox" class="form-check-input shadow-3xs" />
+                                        </th>
+                                        <th>Sản Phẩm</th>
                                         <th class="text-end">Đơn Giá</th>
                                         <th class="text-center">Số Lượng</th>
                                         <th class="text-center">Giá</th>
@@ -72,7 +75,10 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td class="ps-4">
+                                            <td class="ps-4 text-center">
+                                                <input type="checkbox" class="form-check-input item-checkbox shadow-3xs" data-product-id="@item.ProductId" data-total-price="@item.TotalPrice" />
+                                            </td>
+                                            <td>
                                                 <div class="d-flex align-items-center">
                                                     <div>
                                                         <h6 class="mb-0 fw-semibold-600 text-dark">@item.ProductName</h6>
@@ -120,16 +126,16 @@
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Tổng tiền sản phẩm</span>
-                            <span class="fw-bold text-dark fs-5">@totalAmount.ToString("N0") đ</span>
+                            <span class="fw-bold text-dark fs-5" id="cartTotalAmount">0 đ</span>
                         </div>
                         <div class="text-muted small mb-4">
                             <i class="bi bi-info-circle me-1"></i> Phí vận chuyển và các tùy chọn thanh toán cụ thể sẽ được áp dụng tại bước tiếp theo.
                         </div>
                         <hr class="my-3" style="border-top: 1px solid #e2e8f0;">
 
-                        <a href="/Checkout" class="btn btn-gradient w-100 py-2.5 fw-bold-700 text-uppercase mb-3" style="font-size: 0.9rem;">
+                        <button type="button" id="btnProceedCheckout" class="btn btn-gradient w-100 py-2.5 fw-bold-700 text-uppercase mb-3" style="font-size: 0.9rem;" disabled>
                             Tiến Hành Đặt Hàng <i class="bi bi-arrow-right-short ms-1 fs-5"></i>
-                        </a>
+                        </button>
 
                         <a href="/" class="btn btn-outline-gradient w-100 py-2 fw-semibold text-center text-decoration-none" style="font-size: 0.85rem;">
                             <i class="bi bi-arrow-left-short me-1 fs-5"></i> Tiếp tục mua sắm
@@ -174,6 +180,78 @@
         }
         input.form.submit();
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+        const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+        const cartTotalAmount = document.getElementById("cartTotalAmount");
+        const btnProceedCheckout = document.getElementById("btnProceedCheckout");
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN').format(value);
+        }
+
+        function updateCartSummary() {
+            let total = 0;
+            let checkedCount = 0;
+
+            itemCheckboxes.forEach(cb => {
+                if (cb.checked) {
+                    total += parseFloat(cb.getAttribute("data-total-price")) || 0;
+                    checkedCount++;
+                }
+            });
+
+            cartTotalAmount.innerText = formatCurrency(total) + " đ";
+
+            if (checkedCount > 0) {
+                btnProceedCheckout.removeAttribute("disabled");
+            } else {
+                btnProceedCheckout.setAttribute("disabled", "disabled");
+            }
+
+            if (itemCheckboxes.length > 0 && checkedCount === itemCheckboxes.length) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCount > 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener("change", function () {
+                const isChecked = selectAllCheckbox.checked;
+                itemCheckboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                });
+                updateCartSummary();
+            });
+        }
+
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                updateCartSummary();
+            });
+        });
+
+        if (btnProceedCheckout) {
+            btnProceedCheckout.addEventListener("click", function () {
+                const checkedBoxes = document.querySelectorAll(".item-checkbox:checked");
+                if (checkedBoxes.length === 0) {
+                    alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+                    return;
+                }
+                const ids = Array.from(checkedBoxes).map(cb => cb.getAttribute("data-product-id")).join(",");
+                window.location.href = `/Checkout?productIds=${ids}`;
+            });
+        }
+
+        updateCartSummary();
+    });
 </script>
 
 <style>
@@ -406,4 +484,14 @@
             font-weight: 600;
             outline: none;
         }
+
+    .form-check-input {
+        cursor: pointer;
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    .form-check-input:checked {
+        background-color: #1e3c72;
+        border-color: #1e3c72;
+    }
 </style>

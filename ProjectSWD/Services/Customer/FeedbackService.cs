@@ -24,19 +24,19 @@ namespace ProjectSWD.Services.Customer
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId);
 
-            if (order == null) return "Order not found or access denied.";
-            if (order.ApprovementStatus != OrderStatus.Delivered)
-                return "Feedback can only be submitted for products that have been successfully delivered.";
+            if (order == null) return "Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.";
+            if (order.ApprovementStatus != OrderStatus.Delivered && order.Status != "Delivered Successfully")
+                return "Chỉ có thể gửi đánh giá cho những sản phẩm đã được giao hàng thành công.";
 
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
-            if (orderItem == null) return "Product not found in this order.";
+            if (orderItem == null) return "Không tìm thấy sản phẩm trong đơn hàng này.";
 
             var existingReview = await context.Reviews
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r =>
                     r.CustomerId == customerId && r.OrderId == orderId && r.ProductId == productId);
 
-            if (existingReview != null) return "You can only submit one review per purchased product per order.";
+            if (existingReview != null) return "Bạn chỉ có thể gửi một đánh giá cho mỗi sản phẩm đã mua trên mỗi đơn hàng.";
 
             return null; // Valid
         }
@@ -64,7 +64,7 @@ namespace ProjectSWD.Services.Customer
             if (_profanities.Any(lowerContent.Contains))
             {
                 throw new InvalidOperationException(
-                    "Your review contains inappropriate language. Please revise and try again.");
+                    "Đánh giá của bạn chứa ngôn từ không phù hợp. Vui lòng chỉnh sửa lại và thử lại.");
             }
 
             // Validate order status and customer ownership
@@ -74,20 +74,20 @@ namespace ProjectSWD.Services.Customer
 
             if (order == null)
             {
-                throw new InvalidOperationException("Order not found or access denied.");
+                throw new InvalidOperationException("Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.");
             }
 
-            if (order.ApprovementStatus != OrderStatus.Delivered)
+            if (order.ApprovementStatus != OrderStatus.Delivered && order.Status != "Delivered Successfully")
             {
                 throw new InvalidOperationException(
-                    "Feedback can only be submitted for products that have been successfully delivered.");
+                    "Chỉ có thể gửi đánh giá cho những sản phẩm đã được giao hàng thành công.");
             }
 
             // Check if product is in the order
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
             if (orderItem == null)
             {
-                throw new InvalidOperationException("Product not found in this order.");
+                throw new InvalidOperationException("Không tìm thấy sản phẩm trong đơn hàng này.");
             }
 
             // Check if review already exists
@@ -97,7 +97,7 @@ namespace ProjectSWD.Services.Customer
 
             if (existingReview != null)
             {
-                throw new InvalidOperationException("You can only submit one review per purchased product per order.");
+                throw new InvalidOperationException("Bạn chỉ có thể gửi một đánh giá cho mỗi sản phẩm đã mua trên mỗi đơn hàng.");
             }
 
             var review = new Review

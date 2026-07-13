@@ -1,7 +1,7 @@
 @page "{orderId:int}/{productId:int}"
 @model ProjectSWD.Pages.Customer.MyOrders.RateProductModel
 @{
-    ViewData["Title"] = "Rate Product";
+    ViewData["Title"] = "Đánh giá sản phẩm";
 }
 
 <div class="container mt-5">
@@ -9,8 +9,8 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-header bg-white border-0 pt-4 pb-0">
-                    <h3 class="mb-0 text-primary fw-bold">Rate Your Product</h3>
-                    <p class="text-muted">Order ID: @Model.OrderId | Product ID: @Model.ProductId</p>
+                    <h3 class="mb-0 text-primary fw-bold">Đánh giá sản phẩm</h3>
+                    <p class="text-muted">Mã đơn hàng: @Model.OrderId | Mã sản phẩm: @Model.ProductId</p>
                 </div>
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
@@ -20,7 +20,7 @@
                         }
                         <div>
                             <h5 class="mb-1">@Model.ProductName</h5>
-                            <span class="badge bg-secondary">Product ID: @Model.ProductId</span>
+                            <span class="badge bg-secondary">Mã sản phẩm: @Model.ProductId</span>
                         </div>
                     </div>
 
@@ -32,17 +32,17 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         <div class="text-center mt-3">
-                            <a href="/" class="btn btn-primary">Return to Home</a>
+                            <a href="/OrderHistory/Details/@Model.OrderId" class="btn btn-primary">Quay lại chi tiết đơn hàng</a>
                         </div>
                     }
                     else if (!string.IsNullOrEmpty(Model.EligibilityError))
                     {
                         <div class="alert alert-warning" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>Cannot submit feedback:</strong> @Model.EligibilityError
+                            <strong>Không thể gửi đánh giá:</strong> @Model.EligibilityError
                         </div>
                         <div class="text-center mt-3">
-                            <a href="/" class="btn btn-secondary">Go Back</a>
+                            <a href="/OrderHistory/Details/@Model.OrderId" class="btn btn-secondary">Quay lại</a>
                         </div>
                     }
                     else
@@ -56,29 +56,29 @@
 
                         <form method="post">
                             <div class="mb-4">
-                                <label asp-for="Rating" class="form-label fw-bold">Star Rating</label>
+                                <label asp-for="Rating" class="form-label fw-bold">Điểm số đánh giá</label>
                                 <div class="rating-stars mb-2">
                                     <select asp-for="Rating" class="form-select w-25">
-                                        <option value="">Select...</option>
-                                        <option value="5">⭐⭐⭐⭐⭐ (5) Excellent</option>
-                                        <option value="4">⭐⭐⭐⭐ (4) Good</option>
-                                        <option value="3">⭐⭐⭐ (3) Average</option>
-                                        <option value="2">⭐⭐ (2) Poor</option>
-                                        <option value="1">⭐ (1) Terrible</option>
+                                        <option value="">Chọn...</option>
+                                        <option value="5">⭐⭐⭐⭐⭐ (5) Xuất sắc</option>
+                                        <option value="4">⭐⭐⭐⭐ (4) Tốt</option>
+                                        <option value="3">⭐⭐⭐ (3) Trung bình</option>
+                                        <option value="2">⭐⭐ (2) Tệ</option>
+                                        <option value="1">⭐ (1) Rất tệ</option>
                                     </select>
                                 </div>
                                 <span asp-validation-for="Rating" class="text-danger"></span>
                             </div>
 
                             <div class="mb-4">
-                                <label asp-for="Content" class="form-label fw-bold">Write a review</label>
-                                <textarea asp-for="Content" class="form-control" rows="5" placeholder="What did you like or dislike?"></textarea>
+                                <label asp-for="Content" class="form-label fw-bold">Viết đánh giá</label>
+                                <textarea asp-for="Content" class="form-control" rows="5" placeholder="Bạn thích hay không thích điều gì về sản phẩm này?"></textarea>
                                 <span asp-validation-for="Content" class="text-danger"></span>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a href="/" class="btn btn-light me-md-2">Cancel</a>
-                                <button type="submit" class="btn btn-primary px-4">Submit Feedback</button>
+                                <a href="/OrderHistory/Details/@Model.OrderId" class="btn btn-light me-md-2">Hủy</a>
+                                <button type="submit" class="btn btn-primary px-4">Gửi đánh giá</button>
                             </div>
                         </form>
                     }

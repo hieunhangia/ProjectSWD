@@ -14,18 +14,18 @@ namespace ProjectSWD.Services.Customer
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId);
 
-            if (order == null) return "Order not found or access denied.";
-            if (order.ApprovementStatus != OrderStatus.Delivered) return "Only delivered orders are eligible for a refund.";
+            if (order == null) return "Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.";
+            if (order.ApprovementStatus != OrderStatus.Delivered && order.Status != "Delivered Successfully") return "Chỉ những đơn hàng đã giao mới đủ điều kiện được hoàn tiền.";
             
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
-            if (orderItem == null) return "Product does not belong to this order.";
+            if (orderItem == null) return "Sản phẩm không thuộc về đơn hàng này.";
 
             var existingRefund = await context.Refunds
                 .Include(r => r.RefundItems)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.OrderId == orderId && r.RefundItems.Any(ri => ri.ProductId == productId));
             
-            if (existingRefund != null) return "You have already submitted a refund request for this product.";
+            if (existingRefund != null) return "Bạn đã gửi yêu cầu hoàn tiền cho sản phẩm này rồi.";
 
             return null; 
         }
@@ -46,7 +46,7 @@ namespace ProjectSWD.Services.Customer
         public async Task CreateRefundRequestAsync(int orderId, string customerId, string reason, int productId, decimal quantity)
         {
             if (quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than 0.");
+                throw new ArgumentException("Số lượng phải lớn hơn 0.");
 
             var order = await context.Orders
                 .Include(o => o.OrderItems)
@@ -54,24 +54,24 @@ namespace ProjectSWD.Services.Customer
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId);
 
             if (order == null)
-                throw new InvalidOperationException("Order not found or access denied.");
+                throw new InvalidOperationException("Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.");
             
-            if (order.ApprovementStatus != OrderStatus.Delivered)
-                throw new InvalidOperationException("Only delivered orders are eligible for a refund.");
+            if (order.ApprovementStatus != OrderStatus.Delivered && order.Status != "Delivered Successfully")
+                throw new InvalidOperationException("Chỉ những đơn hàng đã giao mới đủ điều kiện được hoàn tiền.");
 
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
             if (orderItem == null)
-                throw new InvalidOperationException("Product does not belong to this order.");
+                throw new InvalidOperationException("Sản phẩm không thuộc về đơn hàng này.");
 
             if (quantity > orderItem.Quantity)
-                throw new InvalidOperationException($"Quantity cannot exceed {orderItem.Quantity}.");
+                throw new InvalidOperationException($"Số lượng không thể vượt quá {orderItem.Quantity}.");
 
             var existingRefund = await context.Refunds
                 .Include(r => r.RefundItems)
                 .FirstOrDefaultAsync(r => r.OrderId == orderId && r.RefundItems.Any(ri => ri.ProductId == productId));
 
             if (existingRefund != null)
-                throw new InvalidOperationException("You have already submitted a refund request for this product.");
+                throw new InvalidOperationException("Bạn đã gửi yêu cầu hoàn tiền cho sản phẩm này rồi.");
 
             var refundItem = new RefundItem
             {
