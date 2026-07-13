@@ -783,7 +783,7 @@ namespace ProjectSWD.Data.Configuration
                         FullName = cus1.FullName, PhoneNumber = cus1.Phone,
                         Time = new DateTime(2026, 7, 1, 9, 30, 0),
                         TotalPrice = 210000,
-                        ApprovementStatus = OrderStatus.Delivered,
+                        Status = OrderStatus.Delivered,
                         Customer = cus1, Staff = staff1
                     },
                     new Order
@@ -791,7 +791,7 @@ namespace ProjectSWD.Data.Configuration
                         FullName = cus2.FullName, PhoneNumber = cus2.Phone,
                         Time = new DateTime(2026, 7, 2, 14, 15, 0),
                         TotalPrice = 145000,
-                        ApprovementStatus = OrderStatus.Delivered,
+                        Status = OrderStatus.Delivered,
                         Customer = cus2, Staff = staff1
                     },
                     new Order
@@ -799,7 +799,7 @@ namespace ProjectSWD.Data.Configuration
                         FullName = cus3.FullName, PhoneNumber = cus3.Phone,
                         Time = new DateTime(2026, 7, 5, 10, 0, 0),
                         TotalPrice = 380000,
-                        ApprovementStatus = OrderStatus.Confirmed,
+                        Status = OrderStatus.Confirmed,
                         Customer = cus3, Staff = staff2
                     },
                     new Order
@@ -807,7 +807,7 @@ namespace ProjectSWD.Data.Configuration
                         FullName = cus1.FullName, PhoneNumber = cus1.Phone,
                         Time = new DateTime(2026, 7, 6, 16, 45, 0),
                         TotalPrice = 120000,
-                        ApprovementStatus = OrderStatus.Processing,
+                        Status = OrderStatus.InTransit,
                         Customer = cus1, Staff = staff1
                     },
                     new Order
@@ -815,7 +815,7 @@ namespace ProjectSWD.Data.Configuration
                         FullName = cus4.FullName, PhoneNumber = cus4.Phone,
                         Time = new DateTime(2026, 7, 7, 8, 20, 0),
                         TotalPrice = 275000,
-                        ApprovementStatus = OrderStatus.Cancelled,
+                        Status = OrderStatus.Cancelled,
                         Customer = cus4, Staff = staff2
                     },
                     new Order

@@ -2,9 +2,10 @@ namespace ProjectSWD.Data.Enums
 {
     public enum OrderStatus
     {
-        Processing,
+        AwaitingConfirmation,
         Confirmed,
-        Cancelled,
-        Delivered
+        InTransit,
+        Delivered,
+        Cancelled
     }
 }

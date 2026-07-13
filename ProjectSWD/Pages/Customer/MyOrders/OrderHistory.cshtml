@@ -1,3 +1,4 @@
+@using ProjectSWD.Data.Enums
 @model ProjectSWD.Data.Entities.Order
 @{
     ViewData["Title"] = "Chi Tiết Đơn Hàng #" + Model.Id;
@@ -5,24 +6,10 @@
     var shippingFee = Model.TotalPrice - subtotal;
 
     var currentStatus = Model.Status;
-    if (string.IsNullOrWhiteSpace(currentStatus))
-    {
-        currentStatus = "Awaiting Confirmation";
-    }
-    var statusValue = currentStatus switch
-    {
-        "Cancelled" => 0,
-        "Awaiting Confirmation" => 1,
-        "Confirmed" => 2,
-        "In Transit" => 3,
-        "Delivered Successfully" => 4,
-        _ => 1
-    };
-
     string progressWidth = "0%";
-    if (statusValue == 2) progressWidth = "33.33%";
-    else if (statusValue == 3) progressWidth = "66.66%";
-    else if (statusValue == 4) progressWidth = "100%";
+    if (currentStatus == OrderStatus.Confirmed) progressWidth = "33.33%";
+    else if (currentStatus == OrderStatus.InTransit) progressWidth = "66.66%";
+    else if (currentStatus == OrderStatus.Delivered) progressWidth = "100%";
 }
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,14 +36,14 @@
                                 id="btn-cancel-order"
                                 class="btn btn-danger px-4 py-2"
                                 style="border-radius: 8px; font-weight: 600;"
-                                @(statusValue == 1 ? "" : "disabled")
+                                @(currentStatus == OrderStatus.AwaitingConfirmation ? "" : "disabled")
                                 onclick="confirmCancelOrder()">
                             <i class="bi bi-x-circle me-1"></i> Hủy Đơn Hàng
                         </button>
 
                         <button type="button"
                                 id="btn-track-status"
-                                class="btn btn-success px-4 py-2 @(statusValue >= 4 || statusValue == 0 ? "d-none" : "")"
+                                class="btn btn-success px-4 py-2 @(currentStatus is OrderStatus.Delivered or OrderStatus.Cancelled ? "d-none" : "")"
                                 style="border-radius: 8px; font-weight: 600;"
                                 onclick="advanceTracking()">
                             <span class="spinner-border spinner-border-sm d-none me-2" id="track-spinner" role="status" aria-hidden="true"></span>
@@ -67,7 +54,7 @@
                 </div>
             </div>
 
-            <div id="cancellation-alert" class="alert alert-danger d-flex align-items-center mb-4 @(statusValue == 0 ? "" : "d-none")" role="alert" style="border-radius: 12px;">
+            <div id="cancellation-alert" class="alert alert-danger d-flex align-items-center mb-4 @(currentStatus == OrderStatus.Cancelled ? "" : "d-none")" role="alert" style="border-radius: 12px;">
                 <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
                 <div>
                     <h6 class="alert-heading fw-bold mb-1">Đơn hàng này đã bị hủy!</h6>
@@ -84,57 +71,69 @@
                     <div class="d-flex align-items-center gap-3">
                         <span class="text-muted text-sm">Thời gian: <strong>@Model.Time.ToString("dd/MM/yyyy HH:mm")</strong></span>
                         <div id="status-badge-container">
-                            @if (currentStatus == "Cancelled")
+                            @if (currentStatus == OrderStatus.Cancelled)
                             {
                                 <span class="badge bg-danger-subtle text-danger status-badge">Đã Hủy</span>
                             }
-                            else if (currentStatus == "Awaiting Confirmation")
+                            else if (currentStatus == OrderStatus.AwaitingConfirmation)
                             {
                                 <span class="badge bg-warning-subtle text-warning status-badge">Chờ Xác Nhận</span>
                             }
-                            else if (currentStatus == "Confirmed")
+                            else if (currentStatus == OrderStatus.Confirmed)
                             {
                                 <span class="badge bg-primary-subtle text-primary status-badge">Đã Xác Nhận</span>
                             }
-                            else if (currentStatus == "In Transit")
+                            else if (currentStatus == OrderStatus.InTransit)
                             {
                                 <span class="badge bg-info-subtle text-info status-badge">Đang Giao Hàng</span>
                             }
-                            else if (currentStatus == "Delivered Successfully")
+                            else if (currentStatus == OrderStatus.Delivered)
                             {
                                 <span class="badge bg-success-subtle text-success status-badge">Đã Giao Thành Công</span>
                             }
                         </div>
                     </div>
                 </div>
+                
+                @{
+                    var statusValue = currentStatus switch
+                    {
+                        OrderStatus.Cancelled => 0,
+                        OrderStatus.AwaitingConfirmation => 1,
+                        OrderStatus.Confirmed => 2,
+                        OrderStatus.InTransit => 3,
+                        OrderStatus.Delivered => 4,
+                        _ => 1
+                    };
+                }
 
                 <div class="card-body p-4">
 
                     <div class="timeline-stepper">
                         <div class="stepper-progress" style="width: @progressWidth;"></div>
 
-                        <div class="stepper-step @(statusValue >= 1 && statusValue != 0 ? "active" : "")" id="step-1">
+                        <div class="stepper-step @(statusValue >= 1 ? "active" : "")" id="step-1">
                             <div class="step-circle">
                                 <i class="bi bi-hourglass-split"></i>
                             </div>
                             <div class="step-title">Chờ Xác Nhận</div>
                         </div>
 
-                        <div class="stepper-step @(statusValue >= 2 && statusValue != 0 ? "active" : "")" id="step-2">
+                        <div class="stepper-step @(statusValue >= 2 ? "active" : "")" id="step-2">
                             <div class="step-circle">
                                 <i class="bi bi-check-circle"></i>
                             </div>
                             <div class="step-title">Đã Xác Nhận</div>
                         </div>
 
-                        <div class="stepper-step @(statusValue >= 3 && statusValue != 0 ? "active" : "")" id="step-3">
+                        <div class="stepper-step @(statusValue >= 3 ? "active" : "")" id="step-3">
                             <div class="step-circle">
                                 <i class="bi bi-truck"></i>
                             </div>
                             <div class="step-title">Đang Giao Hàng</div>
                         </div>
 
-                        <div class="stepper-step @(statusValue >= 4 && statusValue != 0 ? "active" : "")" id="step-4">
+                        <div class="stepper-step @(statusValue >= 4 ? "active" : "")" id="step-4">
                             <div class="step-circle">
                                 <i class="bi bi-house-check"></i>
                             </div>
@@ -186,7 +185,7 @@
                                                             <div class="fw-semibold text-dark">@(item.Product?.Name ?? "Sản phẩm")</div>
                                                             <div class="mt-1">
                                                                 <span class="text-muted small" style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Mã: #@item.ProductId</span>
-                                                                @if (Model.Status == "Delivered Successfully")
+                                                                @if (Model.Status == OrderStatus.Delivered)
                                                                 {
                                                                     <div class="d-flex flex-wrap gap-2 mt-1">
                                                                         <a href="/Customer/MyOrders/RateProduct/@Model.Id/@item.ProductId" class="badge bg-primary-subtle text-primary border-0 text-decoration-none" style="font-size: 0.7rem; font-weight: 600; padding: 4px 8px;">

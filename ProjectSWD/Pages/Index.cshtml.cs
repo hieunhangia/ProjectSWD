@@ -75,7 +75,7 @@ namespace ProjectSWD.Pages
 
                 // Tổng số lượng đã bán (đơn đã giao) theo sản phẩm
                 var soldQuantities = await _context.OrderItems
-                    .Where(oi => oi.Order.ApprovementStatus == OrderStatus.Delivered)
+                    .Where(oi => oi.Order.Status == OrderStatus.Delivered)
                     .GroupBy(oi => oi.ProductId)
                     .Select(g => new { ProductId = g.Key, Total = g.Sum(oi => oi.Quantity) })
                     .ToDictionaryAsync(x => x.ProductId, x => x.Total);

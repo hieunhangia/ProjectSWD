@@ -17,23 +17,36 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
     {
         private readonly ApplicationDbContext _context = context;
 
-        private static readonly List<string> StatusSteps = new()
+        private static readonly List<ProjectSWD.Data.Enums.OrderStatus> StatusSteps = new()
         {
-            "Awaiting Confirmation",
-            "Confirmed",
-            "In Transit",
-            "Delivered Successfully"
+            ProjectSWD.Data.Enums.OrderStatus.AwaitingConfirmation,
+            ProjectSWD.Data.Enums.OrderStatus.Confirmed,
+            ProjectSWD.Data.Enums.OrderStatus.InTransit,
+            ProjectSWD.Data.Enums.OrderStatus.Delivered
         };
 
-        private int GetStatusCode(string status)
+        private string GetStatusString(ProjectSWD.Data.Enums.OrderStatus status)
         {
             return status switch
             {
-                "Cancelled" => 0,
-                "Awaiting Confirmation" => 1,
-                "Confirmed" => 2,
-                "In Transit" => 3,
-                "Delivered Successfully" => 4,
+                ProjectSWD.Data.Enums.OrderStatus.Cancelled => "Cancelled",
+                ProjectSWD.Data.Enums.OrderStatus.AwaitingConfirmation => "Awaiting Confirmation",
+                ProjectSWD.Data.Enums.OrderStatus.Confirmed => "Confirmed",
+                ProjectSWD.Data.Enums.OrderStatus.InTransit => "In Transit",
+                ProjectSWD.Data.Enums.OrderStatus.Delivered => "Delivered Successfully",
+                _ => "Awaiting Confirmation"
+            };
+        }
+
+        private int GetStatusCode(ProjectSWD.Data.Enums.OrderStatus status)
+        {
+            return status switch
+            {
+                ProjectSWD.Data.Enums.OrderStatus.Cancelled => 0,
+                ProjectSWD.Data.Enums.OrderStatus.AwaitingConfirmation => 1,
+                ProjectSWD.Data.Enums.OrderStatus.Confirmed => 2,
+                ProjectSWD.Data.Enums.OrderStatus.InTransit => 3,
+                ProjectSWD.Data.Enums.OrderStatus.Delivered => 4,
                 _ => 1
             };
         }
@@ -92,33 +105,16 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng." });
             }
 
-            string currentStatus = order.Status;
-            if (string.IsNullOrWhiteSpace(currentStatus) || (!StatusSteps.Contains(currentStatus) && currentStatus != "Cancelled"))
-            {
-                currentStatus = "Awaiting Confirmation";
-            }
+            var currentStatus = order.Status;
 
             int currentIndex = StatusSteps.IndexOf(currentStatus);
 
             if (currentIndex >= 0 && currentIndex < StatusSteps.Count - 1)
             {
                 order.Status = StatusSteps[currentIndex + 1];
-                
-                if (order.Status == "Confirmed")
-                {
-                    order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Confirmed;
-                }
-                else if (order.Status == "In Transit")
-                {
-                    order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Confirmed;
-                }
-                else if (order.Status == "Delivered Successfully")
-                {
-                    order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Delivered;
-                }
 
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, newStatus = order.Status, statusCode = GetStatusCode(order.Status) });
+                return Json(new { success = true, newStatus = GetStatusString(order.Status), statusCode = GetStatusCode(order.Status) });
             }
 
             return Json(new { success = false, message = "Không thể cập nhật thêm trạng thái của đơn hàng." });
@@ -139,16 +135,9 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
                 return Json(new { success = false, message = "Không tìm thấy đơn hàng." });
             }
 
-            string currentStatus = order.Status;
-            if (string.IsNullOrWhiteSpace(currentStatus))
+            if (order.Status == ProjectSWD.Data.Enums.OrderStatus.AwaitingConfirmation)
             {
-                currentStatus = "Awaiting Confirmation";
-            }
-
-            if (currentStatus == "Awaiting Confirmation")
-            {
-                order.Status = "Cancelled";
-                order.ApprovementStatus = ProjectSWD.Data.Enums.OrderStatus.Cancelled;
+                order.Status = ProjectSWD.Data.Enums.OrderStatus.Cancelled;
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, newStatus = "Cancelled", statusCode = 0 });
             }
