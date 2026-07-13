@@ -25,10 +25,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Register Repository and Service
-builder.Services.AddScoped<ProjectSWD.Repositories.IOrderRepository, ProjectSWD.Repositories.OrderRepository>();
+// Register Service
 builder.Services.AddScoped<ProjectSWD.Services.Customer.IOrderService, ProjectSWD.Services.Customer.OrderService>();
-builder.Services.AddScoped<ProjectSWD.Repositories.ICartRepository, ProjectSWD.Repositories.CartRepository>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.ICartService, ProjectSWD.Services.Customer.CartService>();
 
 builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
