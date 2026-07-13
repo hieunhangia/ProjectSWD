@@ -25,7 +25,7 @@ namespace ProjectSWD.Services.Customer
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId);
 
             if (order == null) return "Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.";
-            if (order.ApprovementStatus != OrderStatus.Delivered && order.Status != "Delivered Successfully")
+            if (order.Status != OrderStatus.Delivered)
                 return "Chỉ có thể gửi đánh giá cho những sản phẩm đã được giao hàng thành công.";
 
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
@@ -77,7 +77,7 @@ namespace ProjectSWD.Services.Customer
                 throw new InvalidOperationException("Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.");
             }
 
-            if (order.ApprovementStatus != OrderStatus.Delivered && order.Status != "Delivered Successfully")
+            if (order.Status != OrderStatus.Delivered)
             {
                 throw new InvalidOperationException(
                     "Chỉ có thể gửi đánh giá cho những sản phẩm đã được giao hàng thành công.");

@@ -18,7 +18,7 @@ public class RevenueService
     {
         var query = _context.Orders
             .Include(o => o.Bill)
-            .Where(o => o.ApprovementStatus == OrderStatus.Delivered);
+            .Where(o => o.Status == OrderStatus.Delivered);
 
         if (startDate.HasValue)
             query = query.Where(o => o.Time >= startDate.Value);
@@ -40,7 +40,7 @@ public class RevenueService
     public async Task<List<DailyRevenue>> GetDailyRevenueAsync(DateTime startDate, DateTime endDate)
     {
         var data = await _context.Orders
-            .Where(o => o.ApprovementStatus == OrderStatus.Delivered
+            .Where(o => o.Status == OrderStatus.Delivered
                         && o.Time >= startDate && o.Time <= endDate)
             .GroupBy(o => o.Time.Date)
             .Select(g => new DailyRevenue
@@ -58,7 +58,7 @@ public class RevenueService
     public async Task<List<MonthlyRevenue>> GetMonthlyRevenueAsync(int year)
     {
         var data = await _context.Orders
-            .Where(o => o.ApprovementStatus == OrderStatus.Delivered
+            .Where(o => o.Status == OrderStatus.Delivered
                         && o.Time.Year == year)
             .GroupBy(o => o.Time.Month)
             .Select(g => new MonthlyRevenue
@@ -76,7 +76,7 @@ public class RevenueService
     public async Task<List<TopProduct>> GetTopSellingProductsAsync(int top = 10)
     {
         var data = await _context.OrderItems
-            .Where(oi => oi.Order.ApprovementStatus == OrderStatus.Delivered)
+            .Where(oi => oi.Order.Status == OrderStatus.Delivered)
             .GroupBy(oi => new { oi.ProductId, oi.Product.Name })
             .Select(g => new TopProduct
             {

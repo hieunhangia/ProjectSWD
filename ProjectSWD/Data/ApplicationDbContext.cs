@@ -32,7 +32,7 @@ namespace ProjectSWD.Data
 
 
             modelBuilder.Entity<Order>()
-                .Property(o => o.ApprovementStatus)
+                .Property(o => o.Status)
                 .HasConversion<string>()
                 .HasMaxLength(50);
 

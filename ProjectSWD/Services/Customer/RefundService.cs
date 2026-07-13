@@ -16,7 +16,7 @@ namespace ProjectSWD.Services.Customer
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId);
 
             if (order == null) return new ValidateRefundEligibilityResponseDTO { IsEligible = false, ErrorMessage = "Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối." };
-            if (order.ApprovementStatus != OrderStatus.Delivered) return new ValidateRefundEligibilityResponseDTO { IsEligible = false, ErrorMessage = "Chỉ những đơn hàng đã giao mới đủ điều kiện được hoàn tiền." };
+            if (order.Status != OrderStatus.Delivered) return new ValidateRefundEligibilityResponseDTO { IsEligible = false, ErrorMessage = "Chỉ những đơn hàng đã giao mới đủ điều kiện được hoàn tiền." };
             
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
             if (orderItem == null) return new ValidateRefundEligibilityResponseDTO { IsEligible = false, ErrorMessage = "Sản phẩm không thuộc về đơn hàng này." };
@@ -63,7 +63,7 @@ namespace ProjectSWD.Services.Customer
             if (order == null)
                 throw new InvalidOperationException("Không tìm thấy đơn hàng hoặc quyền truy cập bị từ chối.");
             
-            if (order.ApprovementStatus != OrderStatus.Delivered)
+            if (order.Status != OrderStatus.Delivered)
                 throw new InvalidOperationException("Chỉ những đơn hàng đã giao mới đủ điều kiện được hoàn tiền.");
 
             var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == request.ProductId);

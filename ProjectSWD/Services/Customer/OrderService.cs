@@ -109,9 +109,8 @@ namespace ProjectSWD.Services.Customer
                     Address = checkoutInfo.Address,
                     Time = DateTime.Now,
                     TotalPrice = productTotal + checkoutInfo.ShippingFee,
-                    ApprovementStatus = OrderStatus.Processing,
-                    CustomerId = customer.Id,
-                    Status = "Awaiting Confirmation"
+                    Status = OrderStatus.AwaitingConfirmation,
+                    CustomerId = customer.Id
                 };
 
                 await _context.Orders.AddAsync(order);
@@ -182,7 +181,7 @@ namespace ProjectSWD.Services.Customer
                     ShippingFee = checkoutInfo.ShippingFee,
                     TotalPrice = order.TotalPrice,
                     OrderTime = order.Time,
-                    Status = order.ApprovementStatus.ToString(),
+                    Status = order.Status.ToString(),
                     PaymentMethod = checkoutInfo.PaymentMethod
                 };
             }

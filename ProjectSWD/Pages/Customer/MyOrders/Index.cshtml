@@ -1,3 +1,4 @@
+@using ProjectSWD.Data.Enums
 @model List<ProjectSWD.Data.Entities.Order>
 @{
     ViewData["Title"] = "Lịch sử mua hàng";
@@ -71,23 +72,23 @@
                                                 <strong class="text-dark">@order.TotalPrice.ToString("N0") đ</strong>
                                             </td>
                                             <td class="text-center">
-                                                @if (order.Status == "Cancelled")
+                                                @if (order.Status == OrderStatus.Cancelled)
                                                 {
                                                     <span class="badge bg-danger-subtle text-danger status-badge">Đã Hủy</span>
                                                 }
-                                                else if (order.Status == "Awaiting Confirmation")
+                                                else if (order.Status == OrderStatus.AwaitingConfirmation)
                                                 {
                                                     <span class="badge bg-warning-subtle text-warning status-badge">Chờ Xác Nhận</span>
                                                 }
-                                                else if (order.Status == "Confirmed")
+                                                else if (order.Status == OrderStatus.Confirmed)
                                                 {
                                                     <span class="badge bg-primary-subtle text-primary status-badge">Đã Xác Nhận</span>
                                                 }
-                                                else if (order.Status == "In Transit")
+                                                else if (order.Status == OrderStatus.InTransit)
                                                 {
                                                     <span class="badge bg-info-subtle text-info status-badge">Đang Giao Hàng</span>
                                                 }
-                                                else if (order.Status == "Delivered Successfully")
+                                                else if (order.Status == OrderStatus.Delivered)
                                                 {
                                                     <span class="badge bg-success-subtle text-success status-badge">Đã Giao Thành Công</span>
                                                 }

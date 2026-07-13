@@ -22,10 +22,7 @@ namespace ProjectSWD.Data.Entities
         public DateTime Time { get; set; }
         public decimal TotalPrice { get; set; }
         
-        public OrderStatus ApprovementStatus { get; set; }
-        
-        [MaxLength(50)]
-        public string Status { get; set; } = "Awaiting Confirmation";
+        public OrderStatus Status { get; set; }
  
         public string CustomerId { get; set; }
         public Customer Customer { get; set; }

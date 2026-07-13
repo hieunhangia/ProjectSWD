@@ -12,7 +12,7 @@ using ProjectSWD.Data;
 namespace ProjectSWD.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260709141750_InitialDatabase")]
+    [Migration("20260713070543_InitialDatabase")]
     partial class InitialDatabase
     {
         /// <inheritdoc />
@@ -274,6 +274,24 @@ namespace ProjectSWD.Migrations
                     b.ToTable("Bills");
                 });
 
+            modelBuilder.Entity("ProjectSWD.Data.Entities.CartItem", b =>
+                {
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(10, 2)");
+
+                    b.HasKey("CustomerId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("ProjectSWD.Data.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -358,10 +376,10 @@ namespace ProjectSWD.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApprovementStatus")
+                    b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("CustomerId")
                         .IsRequired()
@@ -379,6 +397,11 @@ namespace ProjectSWD.Migrations
 
                     b.Property<string>("StaffId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
@@ -748,6 +771,25 @@ namespace ProjectSWD.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("ProjectSWD.Data.Entities.CartItem", b =>
+                {
+                    b.HasOne("ProjectSWD.Data.Entities.Customer", "Customer")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectSWD.Data.Entities.Product", "Product")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("ProjectSWD.Data.Entities.Customer", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
@@ -920,6 +962,8 @@ namespace ProjectSWD.Migrations
 
             modelBuilder.Entity("ProjectSWD.Data.Entities.Customer", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("Orders");
 
                     b.Navigation("Reviews");
@@ -951,6 +995,8 @@ namespace ProjectSWD.Migrations
 
             modelBuilder.Entity("ProjectSWD.Data.Entities.Product", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("OrderItems");
 
                     b.Navigation("PromotionProducts");
