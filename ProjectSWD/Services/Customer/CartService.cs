@@ -18,6 +18,7 @@ namespace ProjectSWD.Services.Customer
             var items = await _context.CartItems
                 .Where(c => c.CustomerId == customerId)
                 .Include(c => c.Product)
+                .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
             return items.Select(item => new CartItemDTO
             {
@@ -61,6 +62,7 @@ namespace ProjectSWD.Services.Customer
             if (existingItem != null)
             {
                 existingItem.Quantity = newQuantity;
+                existingItem.CreatedAt = DateTime.Now;
                 _context.CartItems.Update(existingItem);
             }
             else
