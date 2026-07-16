@@ -1,0 +1,109 @@
+@page "{id?}"
+@model ProjectSWD.Pages.Admin.Staff.ConfigStaffModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Chỉnh sửa Nhân Viên" : "Tạo Nhân Viên Mới";
+}
+
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Admin/Staff/Index" class="text-decoration-none">Quản lý Nhân Viên</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Card Header -->
+                <div class="card-header bg-primary bg-gradient py-4 text-white text-center">
+                    <h3 class="fw-bold mb-1">
+                        <i class="bi @(Model.IsEdit ? "bi-person-gear" : "bi-person-plus-fill") me-2"></i>
+                        @ViewData["Title"]
+                    </h3>
+                    <p class="mb-0 opacity-75">Vui lòng điền đầy đủ các thông tin dưới đây</p>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4 p-md-5">
+                    @if (!ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                            <h6 class="fw-bold"><i class="bi bi-exclamation-octagon-fill me-2"></i> Phát hiện lỗi thông tin:</h6>
+                            <div asp-validation-summary="All" class="text-danger small ps-3"></div>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <input type="hidden" asp-for="StaffId" />
+
+                        <!-- FullName -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="FullName" class="form-control rounded-3" placeholder="Nguyễn Văn A" />
+                            <label asp-for="FullName"><i class="bi bi-person me-2 text-muted"></i>Họ và tên</label>
+                            <span asp-validation-for="FullName" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control rounded-3" placeholder="email@example.com" type="email" />
+                            <label asp-for="Email"><i class="bi bi-envelope me-2 text-muted"></i>Email</label>
+                            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Phone" class="form-control rounded-3" placeholder="0901234567" />
+                            <label asp-for="Phone"><i class="bi bi-telephone me-2 text-muted"></i>Số điện thoại</label>
+                            <span asp-validation-for="Phone" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25" />
+
+                        <!-- Security Section Info -->
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-shield-lock-fill text-primary me-2fs-5"></i>
+                            <h6 class="fw-bold mb-0 text-dark">Thông tin bảo mật</h6>
+                        </div>
+
+                        @if (Model.IsEdit)
+                        {
+                            <div class="alert alert-light border border-info-subtle mb-3 py-2 text-info small">
+                                <i class="bi bi-info-circle-fill me-1"></i> Để trống các trường mật khẩu bên dưới nếu không muốn thay đổi mật khẩu hiện tại của nhân viên này.
+                            </div>
+                        }
+
+                        <!-- Password -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control rounded-3" placeholder="Mật khẩu" type="password" />
+                            <label asp-for="Password"><i class="bi bi-key me-2 text-muted"></i>Mật khẩu</label>
+                            <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-floating mb-4">
+                            <input asp-for="ConfirmPassword" class="form-control rounded-3" placeholder="Nhập lại mật khẩu" type="password" />
+                            <label asp-for="ConfirmPassword"><i class="bi bi-key-fill me-2 text-muted"></i>Xác nhận mật khẩu</label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="/Admin/Staff/Index" class="btn btn-light rounded-pill px-4 me-md-2 py-2">
+                                Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-primary bg-gradient rounded-pill px-5 py-2 shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Lưu thông tin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

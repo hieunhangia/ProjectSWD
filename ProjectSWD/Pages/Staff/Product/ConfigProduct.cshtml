@@ -1,0 +1,179 @@
+@page "{id:int?}"
+@model ProjectSWD.Pages.Staff.Product.ConfigProductModel
+@{
+    ViewData["Title"] = Model.IsEdit ? "Chỉnh sửa Sản phẩm" : "Thêm Sản phẩm Mới";
+}
+
+<div class="container mt-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Staff/Product/Index" class="text-decoration-none">Quản lý Sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header -->
+                <div class="card-header bg-primary bg-gradient py-4 text-white">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="bi @(Model.IsEdit ? "bi-box-seam-fill" : "bi-plus-square-fill") fs-3 me-3"></i>
+                        <div class="text-center">
+                            <h3 class="fw-bold mb-0">@ViewData["Title"]</h3>
+                            <p class="mb-0 opacity-75 small">Điền các thông tin sản phẩm bên dưới</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4 p-md-5">
+                    @if (!ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                            <h6 class="fw-bold"><i class="bi bi-exclamation-octagon-fill me-2"></i> Lỗi nhập liệu:</h6>
+                            <div asp-validation-summary="All" class="text-danger small ps-3"></div>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <input type="hidden" asp-for="ProductId" />
+
+                        <div class="row g-4">
+                            <!-- Left Column: Form Inputs -->
+                            <div class="col-md-7">
+                                <!-- Name -->
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Name" class="form-control rounded-3" placeholder="Tên sản phẩm" />
+                                    <label asp-for="Name"><i class="bi bi-tag-fill me-2 text-muted"></i>Tên sản phẩm</label>
+                                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <!-- ImageUrl -->
+                                <div class="form-floating mb-3">
+                                    <input asp-for="ImageUrl" id="ImageUrlInput" class="form-control rounded-3" placeholder="Đường dẫn ảnh" />
+                                    <label asp-for="ImageUrl"><i class="bi bi-image me-2 text-muted"></i>Đường dẫn ảnh (URL)</label>
+                                    <span asp-validation-for="ImageUrl" class="text-danger small mt-1 d-block"></span>
+                                </div>
+
+                                <div class="row g-3">
+                                    <!-- Price -->
+                                    <div class="col-sm-6">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="Price" type="number" step="1000" class="form-control rounded-3" placeholder="Giá bán" />
+                                            <label asp-for="Price"><i class="bi bi-cash me-2 text-muted"></i>Giá bán (đ)</label>
+                                            <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quantity -->
+                                    <div class="col-sm-6">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="Quantity" type="number" step="any" class="form-control rounded-3" placeholder="Số lượng" />
+                                            <label asp-for="Quantity"><i class="bi bi-boxes me-2 text-muted"></i>Số lượng tồn kho</label>
+                                            <span asp-validation-for="Quantity" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <!-- Category -->
+                                    <div class="col-sm-6">
+                                        <div class="form-floating mb-3">
+                                            <select asp-for="CategoryId" class="form-select rounded-3" asp-items="Model.CategoryOptions">
+                                                <option value="">-- Chọn danh mục --</option>
+                                            </select>
+                                            <label asp-for="CategoryId"><i class="bi bi-grid-3x3-gap me-2 text-muted"></i>Danh mục</label>
+                                            <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Unit -->
+                                    <div class="col-sm-6">
+                                        <div class="form-floating mb-3">
+                                            <select asp-for="UnitId" class="form-select rounded-3" asp-items="Model.UnitOptions">
+                                                <option value="">-- Chọn đơn vị --</option>
+                                            </select>
+                                            <label asp-for="UnitId"><i class="bi bi-rulers me-2 text-muted"></i>Đơn vị tính</label>
+                                            <span asp-validation-for="UnitId" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Image Preview -->
+                            <div class="col-md-5 d-flex flex-column align-items-center justify-content-center border-start border-light py-3">
+                                <span class="text-muted mb-2 fw-semibold"><i class="bi bi-eye me-1"></i> Xem trước hình ảnh</span>
+                                <div class="preview-box bg-light border rounded-3 shadow-sm d-flex align-items-center justify-content-center overflow-hidden mb-3">
+                                    <img id="imagePreview" src="" alt="Image Preview" class="img-fluid" style="display:none; max-height: 250px; object-fit: contain;" />
+                                    <div id="noImageText" class="text-center text-muted p-4">
+                                        <i class="bi bi-image fs-1 d-block mb-2"></i>
+                                        <span>Chưa có ảnh hoặc liên kết ảnh không hợp lệ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25" />
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/Staff/Product/Index" class="btn btn-light rounded-pill px-4 me-md-2 py-2">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary bg-gradient rounded-pill px-5 py-2 shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Lưu sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .preview-box {
+        width: 100%;
+        max-width: 320px;
+        height: 260px;
+        position: relative;
+    }
+    .preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const imageUrlInput = document.getElementById('ImageUrlInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const noImageText = document.getElementById('noImageText');
+
+        function updateImagePreview() {
+            const url = imageUrlInput.value.trim();
+            if (url) {
+                imagePreview.src = url;
+                imagePreview.style.display = 'block';
+                noImageText.style.display = 'none';
+            } else {
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+                noImageText.style.display = 'block';
+            }
+        }
+
+        imageUrlInput.addEventListener('input', updateImagePreview);
+        // Run on page load in case of editing or reload
+        document.addEventListener('DOMContentLoaded', updateImagePreview);
+
+        // Fallback for broken image links
+        imagePreview.addEventListener('error', function() {
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            noImageText.style.display = 'block';
+        });
+    </script>
+}
