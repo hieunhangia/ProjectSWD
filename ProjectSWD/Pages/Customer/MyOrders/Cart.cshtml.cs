@@ -117,7 +117,6 @@ namespace ProjectSWD.Controllers.Customer
             try
             {
                 await _cartService.AddToCartAsync(userId, product.Id, 1);
-                TempData["SuccessMessage"] = $"Đã thêm sản phẩm mẫu '{product.Name}' vào giỏ hàng!";
             }
             catch (Exception ex)
             {

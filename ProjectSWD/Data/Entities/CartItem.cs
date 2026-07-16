@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectSWD.Data.Entities
 {
@@ -11,5 +11,7 @@ namespace ProjectSWD.Data.Entities
         public Product Product { get; set; }
 
         public decimal Quantity { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
