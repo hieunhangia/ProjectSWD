@@ -14,9 +14,9 @@ namespace ProjectSWD.Controllers.Customer
 {
     [Authorize]
     [Route("Cart")]
-    public class Cart(ICartService cartService, UserManager<IdentityUser> userManager, ApplicationDbContext context) : Controller
+    public class Cart(CartService cartService, UserManager<IdentityUser> userManager, ApplicationDbContext context) : Controller
     {
-        private readonly ICartService _cartService = cartService;
+        private readonly CartService _cartService = cartService;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
 

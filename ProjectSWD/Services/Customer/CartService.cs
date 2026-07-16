@@ -9,7 +9,7 @@ using ProjectSWD.DTOs;
 
 namespace ProjectSWD.Services.Customer
 {
-    public class CartService(ApplicationDbContext context) : ICartService
+    public class CartService(ApplicationDbContext context)
     {
         private readonly ApplicationDbContext _context = context;
 
