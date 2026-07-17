@@ -46,6 +46,7 @@
                                 id="btn-track-status"
                                 class="btn btn-success px-4 py-2 @(currentStatus is OrderStatus.Delivered or OrderStatus.Cancelled ? "d-none" : "")"
                                 style="border-radius: 8px; font-weight: 600;"
+                                @(currentStatus != OrderStatus.AwaitingConfirmation ? "" : "disabled")
                                 onclick="advanceTracking()">
                             <span class="spinner-border spinner-border-sm d-none me-2" id="track-spinner" role="status" aria-hidden="true"></span>
                             <i class="bi bi-geo-alt me-1" id="track-icon"></i> Kiểm tra trạng thái
