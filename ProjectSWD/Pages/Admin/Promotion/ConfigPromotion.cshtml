@@ -63,33 +63,6 @@
                     </div>
                 </div>
 
-                @* === Voucher Code Option (A1) === *@
-                <div class="row mb-3">
-                    <div class="col-md-8">
-                        <div class="form-check">
-                            <input asp-for="IsCodeBased" class="form-check-input" id="IsCodeBased" />
-                            <label class="form-check-label fw-bold" for="IsCodeBased">Đây là khuyến mãi dạng mã code (Voucher Code)</label>
-                        </div>
-                        <small class="text-muted">Nếu bật, bạn sẽ nhập mã code và các giới hạn theo người dùng.</small>
-                    </div>
-                </div>
-
-                <div id="codeBasedSection" style="display: @(Model.IsCodeBased ? "block" : "none")">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label asp-for="Code" class="form-label fw-bold">Mã voucher <span class="text-danger">*</span></label>
-                            <input asp-for="Code" class="form-control text-uppercase" placeholder="VD: SALE10" />
-                            <span asp-validation-for="Code" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="PerUserLimit" class="form-label fw-bold">Giới hạn / người dùng</label>
-                            <input asp-for="PerUserLimit" class="form-control" placeholder="VD: 1" />
-                            <span asp-validation-for="PerUserLimit" class="text-danger"></span>
-                            <small class="text-muted">Số lần tối đa mỗi người dùng được sử dụng mã này.</small>
-                        </div>
-                    </div>
-                </div>
-
                 <h5 class="text-primary mt-4">Loại giảm giá</h5>
                 <hr />
 
@@ -170,9 +143,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        document.getElementById('IsCodeBased').addEventListener('change', function () {
-            document.getElementById('codeBasedSection').style.display = this.checked ? 'block' : 'none';
-        });
-    </script>
 }

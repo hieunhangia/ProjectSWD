@@ -92,17 +92,6 @@ public class PromotionService
         return conflicts;
     }
 
-    /// <summary>
-    /// Check if a voucher code is unique (for code-based promotions).
-    /// </summary>
-    public async Task<bool> IsCodeUniqueAsync(string code, int? excludeId = null)
-    {
-        var query = _context.Promotions.Where(p => p.Code == code);
-        if (excludeId.HasValue)
-            query = query.Where(p => p.Id != excludeId.Value);
-        return !await query.AnyAsync();
-    }
-
     public async Task<List<Product>> GetAllProductsAsync()
     {
         return await _context.Products

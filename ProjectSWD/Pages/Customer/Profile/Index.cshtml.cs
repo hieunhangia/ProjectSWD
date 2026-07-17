@@ -114,7 +114,7 @@ public class IndexModel : PageModel
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return Challenge();
 
-            // E2: Verify old password
+            // E1: Verify old password
             var changeResult = await _userManager.ChangePasswordAsync(user, OldPassword, NewPassword);
             if (!changeResult.Succeeded)
             {
@@ -122,7 +122,6 @@ public class IndexModel : PageModel
                 {
                     ModelState.AddModelError(string.Empty, err.Description);
                 }
-                SuccessMessage = "Profile Information Updated Successfully";
                 return Page();
             }
 

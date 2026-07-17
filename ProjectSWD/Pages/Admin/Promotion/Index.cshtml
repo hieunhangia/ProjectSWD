@@ -77,11 +77,6 @@
                             <td>@promo.Id</td>
                             <td>
                                 <strong>@promo.Name</strong>
-                                @if (!string.IsNullOrEmpty(promo.Code))
-                                {
-                                    <br />
-                                    <span class="badge bg-dark">Mã: @promo.Code</span>
-                                }
                                 @if (!string.IsNullOrEmpty(promo.Description))
                                 {
                                     <br /><small class="text-muted">@promo.Description</small>
@@ -249,35 +244,6 @@
         });
     </script>
 }
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận xóa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc muốn xóa khuyến mãi <strong id="deleteName"></strong>?</p>
-                <p class="text-danger mb-0"><small>Hành động này không thể hoàn tác.</small></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <form method="post" asp-page-handler="Delete">
-                    <input type="hidden" name="id" id="deleteId" />
-                    <button type="submit" class="btn btn-danger">Xóa</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        const deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const id = button.getAttribute('data-id');
-            const name = button.getAttribute('data-name');
-            document.getElementById('deleteId').value = id;
-            document.getElementById('deleteName').textContent = name;
         });
     </script>
 }

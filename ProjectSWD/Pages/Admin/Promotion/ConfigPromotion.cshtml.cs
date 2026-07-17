@@ -42,15 +42,6 @@ public class ConfigPromotionModel : PageModel
     [Range(0, double.MaxValue, ErrorMessage = "Số tiền giảm phải là số không âm.")]
     public decimal? FixedAmount { get; set; }
 
-    // ——— Voucher Code (A1) ———
-
-    [BindProperty]
-    [StringLength(100, ErrorMessage = "Mã code không được vượt quá 100 ký tự.")]
-    public string? Code { get; set; }
-
-    [BindProperty]
-    public bool IsCodeBased { get; set; }
-
     [BindProperty]
     public List<int> SelectedProductIds { get; set; } = new();
 
@@ -99,8 +90,6 @@ public class ConfigPromotionModel : PageModel
             PromotionId = promo.Id;
             Name = promo.Name;
             Description = promo.Description;
-            Code = promo.Code;
-            IsCodeBased = !string.IsNullOrEmpty(promo.Code);
             Percentage = promo.Percentage;
             FixedAmount = promo.FixedAmount;
             StartTime = promo.StartTime;
@@ -130,14 +119,6 @@ public class ConfigPromotionModel : PageModel
             ModelState.AddModelError(string.Empty, "Vui lòng nhập số tiền giảm hoặc phần trăm giảm.");
         }
 
-        // === Code uniqueness (A1) ===
-        if (IsCodeBased && !string.IsNullOrEmpty(Code))
-        {
-            var codeUnique = await _promotionService.IsCodeUniqueAsync(Code, PromotionId);
-            if (!codeUnique)
-                ModelState.AddModelError(nameof(Code), "Mã code này đã được sử dụng cho khuyến mãi khác.");
-        }
-
         // === E1: Overlapping campaign check ===
         OverlapWarnings = await _promotionService.CheckOverlappingConflictsAsync(
             StartTime, EndTime, PromotionId);
@@ -157,7 +138,6 @@ public class ConfigPromotionModel : PageModel
 
                 promo.Name = Name;
                 promo.Description = Description;
-                promo.Code = IsCodeBased ? Code : null;
                 promo.FixedAmount = FixedAmount;
                 promo.Percentage = Percentage;
                 promo.StartTime = StartTime;
@@ -179,7 +159,6 @@ public class ConfigPromotionModel : PageModel
                 {
                     Name = Name,
                     Description = Description,
-                    Code = IsCodeBased ? Code : null,
                     FixedAmount = FixedAmount,
                     Percentage = Percentage,
                     IsPercentage = Percentage.HasValue,

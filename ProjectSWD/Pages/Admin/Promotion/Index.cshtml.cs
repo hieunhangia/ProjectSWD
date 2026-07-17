@@ -30,8 +30,7 @@ public class IndexModel : PageModel
             var term = SearchTerm.ToLower();
             Promotions = Promotions.Where(p =>
                 p.Name.ToLower().Contains(term) ||
-                (p.Description != null && p.Description.ToLower().Contains(term)) ||
-                (p.Code != null && p.Code.ToLower().Contains(term))
+                (p.Description != null && p.Description.ToLower().Contains(term))
             ).ToList();
         }
 

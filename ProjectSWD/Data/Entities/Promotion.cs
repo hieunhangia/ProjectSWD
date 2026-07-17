@@ -14,10 +14,6 @@ namespace ProjectSWD.Data.Entities
         [MaxLength(500)]
         public string? Description { get; set; }
         
-        /// <summary>Mã voucher (nếu là code-based promotion)</summary>
-        [MaxLength(100)]
-        public string? Code { get; set; }
-        
         /// <summary>True = Percentage, False = FixedAmount</summary>
         public bool IsPercentage { get; set; }
         
