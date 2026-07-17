@@ -36,6 +36,9 @@ builder.Services.AddScoped<ProjectSWD.Services.Admin.PromotionService>();
 builder.Services.AddScoped<ProjectSWD.Services.Admin.RefundService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.ProfileService>();
 builder.Services.AddScoped<ProjectSWD.Services.Admin.RevenueService>();
+builder.Services.AddScoped<ProjectSWD.Services.Admin.StaffService>();
+builder.Services.AddScoped<ProjectSWD.Services.Staff.ProductService>();
+builder.Services.AddScoped<ProjectSWD.Services.Staff.OrderService>();
 
 var app = builder.Build();
 

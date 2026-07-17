@@ -1,0 +1,529 @@
+@page
+@model ProjectSWD.Pages.Staff.Order.DetailsModel
+@using ProjectSWD.Data.Enums
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng #" + Model.Order.Id;
+    var order = Model.Order;
+    var subtotal = order.OrderItems.Sum(oi => oi.Price * oi.Quantity);
+    var shippingFee = order.TotalPrice - subtotal;
+    if (shippingFee < 0) shippingFee = 0;
+
+    var currentStatus = order.Status;
+    var statusValue = currentStatus switch
+    {
+        OrderStatus.Cancelled => 0,
+        OrderStatus.AwaitingConfirmation => 1,
+        OrderStatus.Confirmed => 2,
+        OrderStatus.InTransit => 3,
+        OrderStatus.Delivered => 4,
+        _ => 1
+    };
+
+    string progressWidth = "0%";
+    if (currentStatus == OrderStatus.Confirmed) progressWidth = "33.33%";
+    else if (currentStatus == OrderStatus.InTransit) progressWidth = "66.66%";
+    else if (currentStatus == OrderStatus.Delivered) progressWidth = "100%";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .details-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        background: #ffffff;
+        margin-bottom: 24px;
+    }
+
+    .card-header-custom {
+        background-color: #ffffff;
+        border-bottom: 1px solid #f1f3f5;
+        padding: 20px 24px;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #8c98a5;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-weight: 500;
+        color: #2b303a;
+        font-size: 0.95rem;
+    }
+
+    /* Stepper/Timeline styles */
+    .timeline-stepper {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 30px 0;
+    }
+
+    .timeline-stepper::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        right: 40px;
+        height: 4px;
+        background-color: #e9ecef;
+        z-index: 1;
+    }
+
+    .stepper-progress {
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        height: 4px;
+        background-color: #0d6efd;
+        z-index: 2;
+        transition: width 0.4s ease;
+    }
+
+    .stepper-step {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        width: 100px;
+    }
+
+    .step-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: 4px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-size: 1.1rem;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+
+    .stepper-step.active .step-circle {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 0 0 5px rgba(13, 110, 253, 0.15);
+    }
+
+    .step-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .stepper-step.active .step-title {
+        color: #212529;
+    }
+
+    /* Table styles */
+    .product-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.95rem;
+    }
+
+    .summary-row.total {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0d6efd;
+        border-top: 1px solid #e9ecef;
+        padding-top: 15px;
+        margin-top: 10px;
+    }
+
+    .btn-action-large {
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-large:hover {
+        transform: translateY(-1px);
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Breadcrumb / Back button -->
+    <div class="mb-4">
+        <a href="/Staff/Order" class="btn btn-outline-secondary" style="border-radius: 8px; font-weight: 600;">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách đơn
+        </a>
+    </div>
+
+    <!-- Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Top Summary Banner -->
+    <div class="card details-card p-4">
+        <div class="row align-items-center g-3">
+            <div class="col-md-6">
+                <span class="text-muted d-block small fw-bold text-uppercase tracking-wider">Chi Tiết Đơn Hàng</span>
+                <h3 class="fw-bold text-dark mb-0">Mã Đơn: #ORD-@order.Id</h3>
+                <span class="text-muted" style="font-size: 0.9rem;">Đặt lúc: <strong>@order.Time.ToString("dd/MM/yyyy HH:mm")</strong></span>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="mb-2">
+                    @switch (currentStatus)
+                    {
+                        case OrderStatus.AwaitingConfirmation:
+                            <span class="badge bg-warning-subtle text-warning badge-status fs-6"><i class="bi bi-hourglass-split me-1"></i>Chờ Xác Nhận</span>
+                            break;
+                        case OrderStatus.Confirmed:
+                            <span class="badge bg-primary-subtle text-primary badge-status fs-6"><i class="bi bi-check-circle me-1"></i>Đã Xác Nhận</span>
+                            break;
+                        case OrderStatus.InTransit:
+                            <span class="badge bg-info-subtle text-info badge-status fs-6"><i class="bi bi-truck me-1"></i>Đang Giao</span>
+                            break;
+                        case OrderStatus.Delivered:
+                            <span class="badge bg-success-subtle text-success badge-status fs-6"><i class="bi bi-house-check me-1"></i>Đã Giao Thành Công</span>
+                            break;
+                        case OrderStatus.Cancelled:
+                            <span class="badge bg-danger-subtle text-danger badge-status fs-6"><i class="bi bi-x-circle me-1"></i>Đã Hủy</span>
+                            break;
+                    }
+                </div>
+                <h4 class="fw-bold text-primary mb-0">@order.TotalPrice.ToString("N0") đ</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stepper Progress (Only show if not cancelled) -->
+    @if (currentStatus != OrderStatus.Cancelled)
+    {
+        <div class="card details-card p-4">
+            <div class="timeline-stepper">
+                <div class="stepper-progress" style="width: @progressWidth;"></div>
+
+                <div class="stepper-step @(statusValue >= 1 ? "active" : "")">
+                    <div class="step-circle">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div class="step-title">Chờ Xác Nhận</div>
+                </div>
+
+                <div class="stepper-step @(statusValue >= 2 ? "active" : "")">
+                    <div class="step-circle">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="step-title">Đã Xác Nhận</div>
+                </div>
+
+                <div class="stepper-step @(statusValue >= 3 ? "active" : "")">
+                    <div class="step-circle">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="step-title">Đang Giao</div>
+                </div>
+
+                <div class="stepper-step @(statusValue >= 4 ? "active" : "")">
+                    <div class="step-circle">
+                        <i class="bi bi-house-check"></i>
+                    </div>
+                    <div class="step-title">Đã Giao</div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger d-flex align-items-center mb-4 border-0 p-3" style="border-radius: 12px; background-color: #fce8e6;">
+            <i class="bi bi-exclamation-triangle-fill fs-3 text-danger me-3"></i>
+            <div>
+                <h6 class="alert-heading fw-bold mb-1" style="color: #c5221f;">Đơn hàng này đã bị hủy!</h6>
+                <span class="text-secondary small">Đơn hàng không còn hoạt động và số lượng sản phẩm đã được tự động hoàn lại kho.</span>
+            </div>
+        </div>
+    }
+
+    <!-- Main Content Layout -->
+    <div class="row">
+        <!-- Left Column: Details & Information -->
+        <div class="col-lg-5">
+            <!-- Customer Card -->
+            <div class="card details-card">
+                <div class="card-header-custom">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Thông Tin Khách Hàng</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <div class="info-label">Họ và Tên</div>
+                        <div class="info-value">@order.FullName</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="info-label">Số Điện Thoại</div>
+                        <div class="info-value">@order.PhoneNumber</div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="info-label">Địa Chỉ Giao Hàng</div>
+                        <div class="info-value">@order.Address</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipment Card -->
+            @if (order.Shipment != null)
+            {
+                <div class="card details-card">
+                    <div class="card-header-custom">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-truck me-2 text-primary"></i>Thông Tin Vận Chuyển</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <div class="info-label">Đối Tác Vận Chuyển</div>
+                            <div class="info-value">@(order.Shipment.DeliveryPartner?.Name ?? "Chưa chỉ định")</div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="info-label">Trạng Thái Vận Chuyển</div>
+                            <div class="info-value">
+                                @switch (order.Shipment.Status)
+                                {
+                                    case ShipmentStatus.Pending:
+                                        <span class="badge bg-warning-subtle text-warning">Chờ Lấy Hàng</span>
+                                        break;
+                                    case ShipmentStatus.InTransit:
+                                        <span class="badge bg-info-subtle text-info">Đang Vận Chuyển</span>
+                                        break;
+                                    case ShipmentStatus.Delivered:
+                                        <span class="badge bg-success-subtle text-success">Đã Giao</span>
+                                        break;
+                                    case ShipmentStatus.Failed:
+                                        <span class="badge bg-danger-subtle text-danger">Giao Thất Bại / Hủy</span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Bill Invoice Card -->
+            @if (order.Bill != null)
+            {
+                <div class="card details-card">
+                    <div class="card-header-custom">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-receipt me-2 text-primary"></i>Hóa Đơn & Thanh Toán</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <div class="info-label">Thời Gian Thanh Toán</div>
+                            <div class="info-value">@order.Bill.PaymentTime.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="info-label">Cửa Hàng</div>
+                            <div class="info-value">@order.Bill.ShopName</div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="info-label">Email Cửa Hàng</div>
+                                <div class="info-value text-truncate" style="font-size: 0.85rem;" title="@order.Bill.ShopEmail">@order.Bill.ShopEmail</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-label">Hotline Cửa Hàng</div>
+                                <div class="info-value" style="font-size: 0.85rem;">@order.Bill.ShopPhone</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Staff In Charge Card -->
+            <div class="card details-card">
+                <div class="card-header-custom">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-lock me-2 text-primary"></i>Nhân Viên Xử Lý</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (order.Staff != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; font-weight: 700; font-size: 1.2rem;">
+                                @order.Staff.FullName.Substring(0, 1).ToUpper()
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0">@order.Staff.FullName</h6>
+                                <span class="text-muted small">@order.Staff.Email</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-2 text-muted-small" style="color: #999;">
+                            <i class="bi bi-question-circle me-1"></i> Chưa có nhân viên xử lý đơn này.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Products Table & Action Buttons -->
+        <div class="col-lg-7">
+            <!-- Items list card -->
+            <div class="card details-card">
+                <div class="card-header-custom">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-basket3 me-2 text-primary"></i>Danh Sách Sản Phẩm</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end pe-4">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.OrderItems)
+                                {
+                                    var itemSubtotal = item.Price * item.Quantity;
+                                    var productImg = string.IsNullOrEmpty(item.Product?.ImageUrl) ? "/images/products/placeholder.jpg" : item.Product.ImageUrl;
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <img src="@productImg" class="product-img me-3" alt="@(item.Product?.Name ?? "Product Image")">
+                                                <div>
+                                                    <span class="fw-semibold text-dark d-block">@(item.Product?.Name ?? "Sản phẩm không khả dụng")</span>
+                                                    <span class="text-muted small">Mã: @item.ProductId</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center fw-semibold">@item.Quantity.ToString("N0")</td>
+                                        <td class="text-end">@item.Price.ToString("N0") đ</td>
+                                        <td class="text-end fw-bold text-dark pe-4">@itemSubtotal.ToString("N0") đ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Payment Summary Box -->
+                    <div class="p-4 bg-light border-top" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                        <div class="summary-row">
+                            <span class="text-muted">Tạm tính:</span>
+                            <span class="fw-semibold">@subtotal.ToString("N0") đ</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="text-muted">Phí vận chuyển:</span>
+                            <span class="fw-semibold">@shippingFee.ToString("N0") đ</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Tổng cộng:</span>
+                            <span>@order.TotalPrice.ToString("N0") đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Controls Card -->
+            <div class="card details-card p-4">
+                <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-gear-fill me-2 text-primary"></i>Hành Động Đơn Hàng</h5>
+                
+                @if (currentStatus == OrderStatus.AwaitingConfirmation)
+                {
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <form method="post" asp-page-handler="Confirm" asp-route-id="@order.Id" onsubmit="return confirm('Bạn có chắc chắn muốn xác nhận đơn hàng #ORD-@order.Id không?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success btn-action-large w-100 shadow-sm">
+                                    <i class="bi bi-check-circle-fill me-2"></i> Xác Nhận Đơn Hàng
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form method="post" asp-page-handler="Cancel" asp-route-id="@order.Id" onsubmit="return confirm('Bạn có chắc chắn muốn HỦY đơn hàng #ORD-@order.Id không? Sản phẩm sẽ được trả lại kho.');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-action-large w-100 shadow-sm">
+                                    <i class="bi bi-x-circle-fill me-2"></i> Hủy Đơn Hàng
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else if (currentStatus == OrderStatus.Confirmed)
+                {
+                    <div class="alert alert-info border-0 mb-3" style="border-radius: 10px;">
+                        <i class="bi bi-info-circle-fill me-2"></i> Đơn hàng này đã được xác nhận. Tiến hành giao hàng khi đơn vị vận chuyển nhận hàng.
+                    </div>
+                    <form method="post" asp-page-handler="Ship" asp-route-id="@order.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-info text-dark btn-action-large w-100 shadow-sm">
+                            <i class="bi bi-truck me-2"></i> Bắt Đầu Giao Hàng
+                        </button>
+                    </form>
+                }
+                else if (currentStatus == OrderStatus.InTransit)
+                {
+                    <div class="alert alert-info border-0 mb-3" style="border-radius: 10px;">
+                        <i class="bi bi-info-circle-fill me-2"></i> Đơn hàng đang được giao bởi bên vận chuyển. Xác nhận hoàn tất khi khách hàng nhận được sản phẩm.
+                    </div>
+                    <form method="post" asp-page-handler="Complete" asp-route-id="@order.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary btn-action-large w-100 shadow-sm">
+                            <i class="bi bi-house-check-fill me-2"></i> Xác Nhận Đã Giao Thành Công
+                        </button>
+                    </form>
+                }
+                else if (currentStatus == OrderStatus.Delivered)
+                {
+                    <div class="alert alert-success border-0 mb-0 p-3 text-center" style="border-radius: 12px; font-weight: 600;">
+                        <i class="bi bi-patch-check-fill me-2"></i> ĐƠN HÀNG ĐÃ ĐƯỢC GIAO THÀNH CÔNG VÀ HOÀN TẤT!
+                    </div>
+                }
+                else if (currentStatus == OrderStatus.Cancelled)
+                {
+                    <div class="alert alert-danger border-0 mb-0 p-3 text-center" style="border-radius: 12px; font-weight: 600;">
+                        <i class="bi bi-x-octagon-fill me-2"></i> ĐƠN HÀNG NÀY ĐÃ BỊ HỦY BỎ!
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
