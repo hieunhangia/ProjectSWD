@@ -13,12 +13,17 @@ public class IndexModel : PageModel
 {
     private readonly ProfileService _profileService;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    public IndexModel(ProfileService profileService, UserManager<IdentityUser> userManager)
+    public IndexModel(ProfileService profileService, UserManager<IdentityUser> userManager,
+                      SignInManager<IdentityUser> signInManager)
     {
         _profileService = profileService;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
+
+    // --- Profile fields ---
 
     [BindProperty]
     [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
@@ -38,10 +43,32 @@ public class IndexModel : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Vui lòng nhập email.")]
-    [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
+    [EmailAddress(ErrorMessage = "Vui lòng nhập email hợp lệ.")]
     public string Email { get; set; } = string.Empty;
 
+    // --- Password change (A1) ---
+
+    [BindProperty]
+    public bool IsChangingPassword { get; set; }
+
+    [BindProperty]
+    [DataType(DataType.Password)]
+    public string? OldPassword { get; set; }
+
+    [BindProperty]
+    [DataType(DataType.Password)]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu mới phải có ít nhất 6 ký tự.")]
+    public string? NewPassword { get; set; }
+
+    [BindProperty]
+    [DataType(DataType.Password)]
+    [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
+    public string? ConfirmNewPassword { get; set; }
+
+    // --- UI state ---
+
     public string? SuccessMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -50,9 +77,7 @@ public class IndexModel : PageModel
 
         var customer = await _profileService.GetCustomerByIdAsync(userId);
         if (customer == null)
-        {
             return NotFound("Không tìm thấy thông tin khách hàng.");
-        }
 
         FullName = customer.FullName;
         Phone = customer.Phone;
@@ -64,20 +89,47 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid) return Page();
-
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return Challenge();
 
-        var success = await _profileService.UpdateCustomerProfileAsync(userId, FullName, Phone, Address);
+        if (!ModelState.IsValid) return Page();
 
+        // Update profile info
+        var success = await _profileService.UpdateCustomerProfileAsync(userId, FullName, Phone, Address);
         if (!success)
         {
             ModelState.AddModelError(string.Empty, "Không thể cập nhật thông tin.");
             return Page();
         }
 
-        SuccessMessage = "Cập nhật thông tin thành công!";
+        // A1: Password change
+        if (IsChangingPassword)
+        {
+            if (string.IsNullOrEmpty(OldPassword) || string.IsNullOrEmpty(NewPassword))
+            {
+                ModelState.AddModelError(string.Empty, "Vui lòng nhập mật khẩu cũ và mật khẩu mới.");
+                return Page();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return Challenge();
+
+            // E2: Verify old password
+            var changeResult = await _userManager.ChangePasswordAsync(user, OldPassword, NewPassword);
+            if (!changeResult.Succeeded)
+            {
+                foreach (var err in changeResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, err.Description);
+                }
+                SuccessMessage = "Profile Information Updated Successfully";
+                return Page();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+        }
+
+        SuccessMessage = "Profile Information Updated Successfully";
         return Page();
     }
 }

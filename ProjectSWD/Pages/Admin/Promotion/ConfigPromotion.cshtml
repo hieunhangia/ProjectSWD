@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/Admin/Promotion/Index">Quản lý khuyến mãi</a></li>
+            <li class="breadcrumb-item"><a href="/Admin/Promotion/Index">Marketing & Promotions Console</a></li>
             <li class="breadcrumb-item active">@ViewData["Title"]</li>
         </ol>
     </nav>
@@ -20,13 +20,32 @@
             @if (TempData["SuccessMessage"] != null)
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
+                    <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @* === E1: Overlapping campaign warnings === *@
+            @if (Model.OverlapWarnings.Any())
+            {
+                <div class="alert alert-warning" role="alert">
+                    <h6><i class="bi bi-exclamation-triangle"></i> ⚠️ Xung đột lịch khuyến mãi</h6>
+                    <ul class="mb-0">
+                        @foreach (var w in Model.OverlapWarnings)
+                        {
+                            <li>@w</li>
+                        }
+                    </ul>
+                    <hr />
+                    <small class="text-muted">Bạn có thể tiếp tục nếu muốn tạo khuyến mãi chồng lấn, hoặc điều chỉnh thời gian / phạm vi.</small>
                 </div>
             }
 
             <form method="post">
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <h5 class="text-primary">Thông tin cơ bản</h5>
+                <hr />
 
                 <div class="row mb-3">
                     <div class="col-md-8">
@@ -39,21 +58,42 @@
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <label asp-for="Description" class="form-label fw-bold">Mô tả</label>
-                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả chi tiết về khuyến mãi..."></textarea>
+                        <textarea asp-for="Description" class="form-control" rows="2" placeholder="Mô tả chi tiết..."></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                 </div>
 
+                @* === Voucher Code Option (A1) === *@
                 <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label asp-for="FixedAmount" class="form-label fw-bold">Số tiền giảm (₫)</label>
-                        <div class="input-group">
-                            <input asp-for="FixedAmount" class="form-control" placeholder="VD: 30000" />
-                            <span class="input-group-text">₫</span>
+                    <div class="col-md-8">
+                        <div class="form-check">
+                            <input asp-for="IsCodeBased" class="form-check-input" id="IsCodeBased" />
+                            <label class="form-check-label fw-bold" for="IsCodeBased">Đây là khuyến mãi dạng mã code (Voucher Code)</label>
                         </div>
-                        <span asp-validation-for="FixedAmount" class="text-danger"></span>
-                        <small class="text-muted">Để trống nếu dùng %</small>
+                        <small class="text-muted">Nếu bật, bạn sẽ nhập mã code và các giới hạn theo người dùng.</small>
                     </div>
+                </div>
+
+                <div id="codeBasedSection" style="display: @(Model.IsCodeBased ? "block" : "none")">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="Code" class="form-label fw-bold">Mã voucher <span class="text-danger">*</span></label>
+                            <input asp-for="Code" class="form-control text-uppercase" placeholder="VD: SALE10" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="PerUserLimit" class="form-label fw-bold">Giới hạn / người dùng</label>
+                            <input asp-for="PerUserLimit" class="form-control" placeholder="VD: 1" />
+                            <span asp-validation-for="PerUserLimit" class="text-danger"></span>
+                            <small class="text-muted">Số lần tối đa mỗi người dùng được sử dụng mã này.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="text-primary mt-4">Loại giảm giá & Phạm vi</h5>
+                <hr />
+
+                <div class="row mb-3">
                     <div class="col-md-4">
                         <label asp-for="Percentage" class="form-label fw-bold">Phần trăm giảm (%)</label>
                         <div class="input-group">
@@ -63,7 +103,51 @@
                         <span asp-validation-for="Percentage" class="text-danger"></span>
                         <small class="text-muted">Để trống nếu dùng số tiền</small>
                     </div>
+                    <div class="col-md-4">
+                        <label asp-for="FixedAmount" class="form-label fw-bold">Số tiền giảm (₫)</label>
+                        <div class="input-group">
+                            <input asp-for="FixedAmount" class="form-control" placeholder="VD: 30000" />
+                            <span class="input-group-text">₫</span>
+                        </div>
+                        <span asp-validation-for="FixedAmount" class="text-danger"></span>
+                        <small class="text-muted">Để trống nếu dùng %</small>
+                    </div>
                 </div>
+
+                @* === Target Scope === *@
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Phạm vi áp dụng <span class="text-danger">*</span></label>
+                        <select asp-for="Scope" class="form-select" id="ScopeSelect">
+                            <option value="Global">🌐 Toàn bộ sản phẩm (Global)</option>
+                            <option value="Category">📂 Theo danh mục (Category)</option>
+                            <option value="SpecificSKU">📦 Sản phẩm cụ thể (Specific SKU)</option>
+                        </select>
+                    </div>
+                </div>
+
+                @* === Category scope (hidden unless Category) === *@
+                <div class="row mb-3" id="categoryScopeSection" style="display: @(Model.IsCategory ? "block" : "none")">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Danh mục</label>
+                        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+                            <option value="">-- Chọn danh mục --</option>
+                        </select>
+                    </div>
+                </div>
+
+                @* === Specific SKU scope (hidden unless SpecificSKU) === *@
+                <div class="row mb-3" id="skuScopeSection" style="display: @(Model.IsSpecificSKU ? "block" : "none")">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Sản phẩm áp dụng</label>
+                        <select asp-for="SelectedProductIds" asp-items="Model.ProductOptions" class="form-select" multiple size="6">
+                        </select>
+                        <small class="text-muted">Giữ Ctrl để chọn nhiều sản phẩm.</small>
+                    </div>
+                </div>
+
+                <h5 class="text-primary mt-4">Thời gian & Giới hạn</h5>
+                <hr />
 
                 <div class="row mb-3">
                     <div class="col-md-4">
@@ -89,23 +173,14 @@
                         <small class="text-muted">Để trống nếu không yêu cầu</small>
                     </div>
                     <div class="col-md-4">
-                        <label asp-for="UsageLimit" class="form-label fw-bold">Giới hạn số lượt sử dụng</label>
+                        <label asp-for="UsageLimit" class="form-label fw-bold">Giới hạn tổng lượt sử dụng</label>
                         <input asp-for="UsageLimit" class="form-control" placeholder="VD: 100" />
                         <span asp-validation-for="UsageLimit" class="text-danger"></span>
                         <small class="text-muted">Để trống nếu không giới hạn</small>
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-8">
-                        <label class="form-label fw-bold">Sản phẩm áp dụng</label>
-                        <select asp-for="SelectedProductIds" asp-items="Model.ProductOptions" class="form-select" multiple size="8">
-                        </select>
-                        <small class="text-muted">Giữ Ctrl để chọn nhiều sản phẩm. Để trống nếu áp dụng cho tất cả.</small>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-primary px-4">
                         <i class="bi bi-save"></i> @(Model.IsEdit ? "Cập nhật" : "Tạo mới")
                     </button>
@@ -118,4 +193,17 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Toggle voucher code section
+        document.getElementById('IsCodeBased').addEventListener('change', function () {
+            document.getElementById('codeBasedSection').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Toggle scope sections
+        document.getElementById('ScopeSelect').addEventListener('change', function () {
+            const v = this.value;
+            document.getElementById('categoryScopeSection').style.display = v === 'Category' ? 'block' : 'none';
+            document.getElementById('skuScopeSection').style.display = v === 'SpecificSKU' ? 'block' : 'none';
+        });
+    </script>
 }

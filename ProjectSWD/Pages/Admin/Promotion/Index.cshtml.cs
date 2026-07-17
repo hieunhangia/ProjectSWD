@@ -30,7 +30,8 @@ public class IndexModel : PageModel
             var term = SearchTerm.ToLower();
             Promotions = Promotions.Where(p =>
                 p.Name.ToLower().Contains(term) ||
-                (p.Description != null && p.Description.ToLower().Contains(term))
+                (p.Description != null && p.Description.ToLower().Contains(term)) ||
+                (p.Code != null && p.Code.ToLower().Contains(term))
             ).ToList();
         }
 
@@ -40,7 +41,17 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPostDeleteAsync(int id)
     {
         await _promotionService.DeleteAsync(id);
-        TempData["SuccessMessage"] = "Xóa khuyến mãi thành công!";
+        TempData["SuccessMessage"] = "Đã xóa khuyến mãi.";
+        return RedirectToPage();
+    }
+
+    /// <summary>
+    /// A2: Emergency Campaign Revocation — terminate an active campaign immediately.
+    /// </summary>
+    public async Task<IActionResult> OnPostTerminateAsync(int id)
+    {
+        await _promotionService.TerminateAsync(id);
+        TempData["SuccessMessage"] = "Khuyến mãi đã bị hủy khẩn cấp (Emergency Terminated).";
         return RedirectToPage();
     }
 }

@@ -52,11 +52,101 @@ public class PromotionService
         }
     }
 
+    /// <summary>
+    /// A2: Emergency Campaign Revocation — terminate an active campaign immediately.
+    /// </summary>
+    public async Task TerminateAsync(int id)
+    {
+        var promotion = await _context.Promotions.FindAsync(id);
+        if (promotion != null)
+        {
+            promotion.IsTerminated = true;
+            promotion.EndTime = DateTime.Now; // force end immediately
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
+    /// E1: Check if any active promotion overlaps with the given product set in the same timeframe.
+    /// Returns conflict descriptions.
+    /// </summary>
+    public async Task<List<string>> CheckOverlappingConflictsAsync(
+        List<int> productIds, DateTime startTime, DateTime endTime, int? excludePromotionId = null)
+    {
+        var conflicts = new List<string>();
+
+        var activePromotions = _context.Promotions
+            .Include(p => p.PromotionProducts)
+            .Where(p => !p.IsTerminated
+                        && p.StartTime < endTime
+                        && p.EndTime > startTime);
+
+        if (excludePromotionId.HasValue)
+            activePromotions = activePromotions.Where(p => p.Id != excludePromotionId.Value);
+
+        var activeList = await activePromotions.ToListAsync();
+
+        foreach (var promo in activeList)
+        {
+            // Global scope overlaps with everything
+            if (promo.Scope == PromotionScope.Global)
+            {
+                conflicts.Add($"Khuyến mãi \"{promo.Name}\" (Toàn bộ sản phẩm) đang hoạt động trong cùng khung thời gian.");
+                continue;
+            }
+
+            // Specific SKU overlap
+            if (promo.Scope == PromotionScope.SpecificSKU && productIds.Any())
+            {
+                var overlapProductIds = promo.PromotionProducts
+                    .Select(pp => pp.ProductId)
+                    .Intersect(productIds)
+                    .ToList();
+
+                if (overlapProductIds.Any())
+                {
+                    var overlapNames = await _context.Products
+                        .Where(p => overlapProductIds.Contains(p.Id))
+                        .Select(p => p.Name)
+                        .ToListAsync();
+
+                    conflicts.Add($"Khuyến mãi \"{promo.Name}\" áp dụng cho sản phẩm: {string.Join(", ", overlapNames)} — bị trùng lịch.");
+                }
+            }
+        }
+
+        return conflicts;
+    }
+
+    /// <summary>
+    /// Check if a voucher code is unique (for code-based promotions).
+    /// </summary>
+    public async Task<bool> IsCodeUniqueAsync(string code, int? excludeId = null)
+    {
+        var query = _context.Promotions.Where(p => p.Code == code);
+        if (excludeId.HasValue)
+            query = query.Where(p => p.Id != excludeId.Value);
+        return !await query.AnyAsync();
+    }
+
     public async Task<List<Product>> GetAllProductsAsync()
     {
         return await _context.Products
             .Include(p => p.Category)
             .Include(p => p.Unit)
+            .OrderBy(p => p.Name)
+            .ToListAsync();
+    }
+
+    public async Task<List<Category>> GetAllCategoriesAsync()
+    {
+        return await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+    }
+
+    public async Task<List<Product>> GetProductsByCategoryAsync(int categoryId)
+    {
+        return await _context.Products
+            .Where(p => p.CategoryId == categoryId)
             .OrderBy(p => p.Name)
             .ToListAsync();
     }
