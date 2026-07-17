@@ -41,7 +41,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    //await scope.ServiceProvider.InitializeAsync(); // Comment lại nếu muốn chạy app mà không seed dữ liệu mẫu
+    await scope.ServiceProvider.InitializeAsync(); // Comment lại nếu muốn chạy app mà không seed dữ liệu mẫu
 }
 
 // Configure the HTTP request pipeline.
