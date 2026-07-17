@@ -15,10 +15,10 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
 {
     [Authorize]
     [Route("Checkout")]
-    public class Checkout(IOrderService orderService, ICartService cartService, ApplicationDbContext context) : Controller
+    public class Checkout(OrderService orderService, CartService cartService, ApplicationDbContext context) : Controller
     {
-        private readonly IOrderService _orderService = orderService;
-        private readonly ICartService _cartService = cartService;
+        private readonly OrderService _orderService = orderService;
+        private readonly CartService _cartService = cartService;
         private readonly ApplicationDbContext _context = context;
 
         [HttpGet("")]

@@ -26,8 +26,8 @@ builder.Services.AddSession(options =>
 });
 
 // Register Service
-builder.Services.AddScoped<ProjectSWD.Services.Customer.IOrderService, ProjectSWD.Services.Customer.OrderService>();
-builder.Services.AddScoped<ProjectSWD.Services.Customer.ICartService, ProjectSWD.Services.Customer.CartService>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.OrderService>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.CartService>();
 
 builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();

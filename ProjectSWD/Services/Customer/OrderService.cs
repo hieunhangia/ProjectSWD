@@ -10,7 +10,7 @@ using ProjectSWD.DTOs;
 
 namespace ProjectSWD.Services.Customer
 {
-    public class OrderService(ApplicationDbContext context) : IOrderService
+    public class OrderService(ApplicationDbContext context)
     {
         private readonly ApplicationDbContext _context = context;
 

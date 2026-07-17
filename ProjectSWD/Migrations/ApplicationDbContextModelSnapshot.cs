@@ -279,6 +279,9 @@ namespace ProjectSWD.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(10, 2)");
 

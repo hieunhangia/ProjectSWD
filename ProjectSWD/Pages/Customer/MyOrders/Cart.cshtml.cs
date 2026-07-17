@@ -14,9 +14,9 @@ namespace ProjectSWD.Controllers.Customer
 {
     [Authorize]
     [Route("Cart")]
-    public class Cart(ICartService cartService, UserManager<IdentityUser> userManager, ApplicationDbContext context) : Controller
+    public class Cart(CartService cartService, UserManager<IdentityUser> userManager, ApplicationDbContext context) : Controller
     {
-        private readonly ICartService _cartService = cartService;
+        private readonly CartService _cartService = cartService;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly ApplicationDbContext _context = context;
 
@@ -117,7 +117,6 @@ namespace ProjectSWD.Controllers.Customer
             try
             {
                 await _cartService.AddToCartAsync(userId, product.Id, 1);
-                TempData["SuccessMessage"] = $"Đã thêm sản phẩm mẫu '{product.Name}' vào giỏ hàng!";
             }
             catch (Exception ex)
             {
