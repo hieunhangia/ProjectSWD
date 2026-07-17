@@ -107,6 +107,12 @@ public class ConfigPromotionModel : PageModel
     {
         await LoadDropdownsAsync();
 
+        // Đảm bảo PromotionId từ route data nếu hidden field không được submit
+        if (!PromotionId.HasValue && RouteData.Values["id"] is string routeId && int.TryParse(routeId, out var parsedId))
+        {
+            PromotionId = parsedId;
+        }
+
         // === E2: Chronological Sequence Inversion ===
         if (EndTime <= StartTime)
         {

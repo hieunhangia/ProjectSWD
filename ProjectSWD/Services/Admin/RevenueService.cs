@@ -86,23 +86,6 @@ public class RevenueService
         return data;
     }
 
-    /// <summary>
-    /// A1: Comparative Growth — Year-over-Year comparison.
-    /// </summary>
-    public async Task<ComparisonData> GetYearOverYearAsync(int currentYear, int previousYear)
-    {
-        var current = await GetMonthlyRevenueAsync(currentYear);
-        var previous = await GetMonthlyRevenueAsync(previousYear);
-
-        return new ComparisonData
-        {
-            CurrentYear = currentYear,
-            PreviousYear = previousYear,
-            CurrentMonths = current,
-            PreviousMonths = previous
-        };
-    }
-
     public async Task<List<TopProduct>> GetTopSellingProductsAsync(int top = 10)
     {
         var data = await _context.OrderItems
@@ -203,14 +186,6 @@ public class MonthlyRevenue
     public int Month { get; set; }
     public decimal Revenue { get; set; }
     public int OrderCount { get; set; }
-}
-
-public class ComparisonData
-{
-    public int CurrentYear { get; set; }
-    public int PreviousYear { get; set; }
-    public List<MonthlyRevenue> CurrentMonths { get; set; } = new();
-    public List<MonthlyRevenue> PreviousMonths { get; set; } = new();
 }
 
 public class CategoryRevenue

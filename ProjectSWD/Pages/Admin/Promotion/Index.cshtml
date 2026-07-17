@@ -89,7 +89,7 @@
                                 }
                                 @if (promo.FixedAmount.HasValue)
                                 {
-                                    <span class="badge bg-success fs-6">@promo.FixedAmount.Value:N0₫</span>
+                                    <span class="badge bg-success fs-6">@promo.FixedAmount.Value.ToString("N0")₫</span>
                                 }
                                 @if (!promo.FixedAmount.HasValue && !promo.Percentage.HasValue)
                                 {
@@ -105,7 +105,7 @@
                             <td class="text-center">
                                 @if (promo.MinimumOrder.HasValue)
                                 {
-                                    <span>@promo.MinimumOrder.Value:N0₫</span>
+                                    <span>@promo.MinimumOrder.Value.ToString("N0")₫</span>
                                 }
                                 else
                                 {
