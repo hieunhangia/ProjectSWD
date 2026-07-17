@@ -1,4 +1,4 @@
-namespace ProjectSWD.DTOs
+namespace ProjectSWD.DTOs.Order
 {
     public class CartItemDTO
     {

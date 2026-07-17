@@ -1,4 +1,5 @@
-@model List<ProjectSWD.DTOs.CartItemDTO>
+@using ProjectSWD.DTOs.Order
+@model List<CartItemDTO>
 @{
     ViewData["Title"] = "Thanh Toán Đơn Hàng";
     var subtotal = Model.Sum(x => x.TotalPrice);

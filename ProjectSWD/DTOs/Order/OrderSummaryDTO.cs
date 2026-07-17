@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ProjectSWD.DTOs
+namespace ProjectSWD.DTOs.Order
 {
     public class OrderSummaryDTO
     {

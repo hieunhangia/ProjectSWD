@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectSWD.DTOs
+namespace ProjectSWD.DTOs.Order
 {
     public class OrderCheckoutDTO
     {

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSWD.Data;
-using ProjectSWD.DTOs;
+using ProjectSWD.DTOs.Order;
 using ProjectSWD.Services.Customer;
 
 namespace ProjectSWD.Controllers.Customer.MyOrders
