@@ -65,7 +65,7 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
                 .OrderByDescending(o => o.Time)
                 .ToListAsync();
 
-            return View("~/Pages/Customer/MyOrders/Index.cshtml", orders);
+            return View("~/Pages/Customer/MyOrders/OrderHistory.cshtml", orders);
         }
 
         [HttpGet("Details/{id}")]
@@ -87,7 +87,7 @@ namespace ProjectSWD.Controllers.Customer.MyOrders
                 return NotFound("Không tìm thấy đơn hàng.");
             }
 
-            return View("~/Pages/Customer/MyOrders/OrderHistory.cshtml", order);
+            return View("~/Pages/Customer/MyOrders/OrderHistoryDetail.cshtml", order);
         }
 
         [HttpPost("AdvanceTracking")]

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSWD.Data;
 using ProjectSWD.Data.Entities;
 using ProjectSWD.Data.Enums;
-using ProjectSWD.DTOs;
+using ProjectSWD.DTOs.Order;
 
 namespace ProjectSWD.Services.Customer
 {

@@ -29,7 +29,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped<ProjectSWD.Services.Customer.OrderService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.CartService>();
 
-builder.Services.AddScoped<ProjectSWD.Services.Customer.FeedbackService>();
+builder.Services.AddScoped<ProjectSWD.Services.Customer.ReviewService>();
 builder.Services.AddScoped<ProjectSWD.Services.Customer.RefundService>();
 builder.Services.AddScoped<ProjectSWD.Services.MockPaymentService>();
 builder.Services.AddScoped<ProjectSWD.Services.Admin.PromotionService>();
