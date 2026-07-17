@@ -52,6 +52,57 @@ public class PromotionService
         }
     }
 
+    /// <summary>
+    /// A2: Emergency Campaign Revocation — terminate an active campaign immediately.
+    /// </summary>
+    public async Task TerminateAsync(int id)
+    {
+        var promotion = await _context.Promotions.FindAsync(id);
+        if (promotion != null)
+        {
+            promotion.IsTerminated = true;
+            promotion.EndTime = DateTime.Now; // force end immediately
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
+    /// E1: Check if any active promotion overlaps in the same timeframe.
+    /// </summary>
+    public async Task<List<string>> CheckOverlappingConflictsAsync(
+        DateTime startTime, DateTime endTime, int? excludePromotionId = null)
+    {
+        var conflicts = new List<string>();
+
+        var activePromotions = _context.Promotions
+            .Where(p => !p.IsTerminated
+                        && p.StartTime < endTime
+                        && p.EndTime > startTime);
+
+        if (excludePromotionId.HasValue)
+            activePromotions = activePromotions.Where(p => p.Id != excludePromotionId.Value);
+
+        var activeList = await activePromotions.ToListAsync();
+
+        foreach (var promo in activeList)
+        {
+            conflicts.Add($"Khuyến mãi \"{promo.Name}\" đang hoạt động trong cùng khung thời gian.");
+        }
+
+        return conflicts;
+    }
+
+    /// <summary>
+    /// Check if a voucher code is unique (for code-based promotions).
+    /// </summary>
+    public async Task<bool> IsCodeUniqueAsync(string code, int? excludeId = null)
+    {
+        var query = _context.Promotions.Where(p => p.Code == code);
+        if (excludeId.HasValue)
+            query = query.Where(p => p.Id != excludeId.Value);
+        return !await query.AnyAsync();
+    }
+
     public async Task<List<Product>> GetAllProductsAsync()
     {
         return await _context.Products

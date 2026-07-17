@@ -19,6 +19,10 @@ public class IndexModel : PageModel
     public List<DailyRevenue> DailyRevenues { get; set; } = new();
     public List<MonthlyRevenue> MonthlyRevenues { get; set; } = new();
     public List<TopProduct> TopProducts { get; set; } = new();
+    public List<CategoryRevenue> CategoryRevenues { get; set; } = new();
+    public ComparisonData? Comparison { get; set; }
+    public List<string> AvailableYears { get; set; } = new();
+    public string? CsvContent { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public DateTime StartDate { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -29,13 +33,31 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int SelectedYear { get; set; } = DateTime.Now.Year;
 
+    [BindProperty(SupportsGet = true)]
+    public bool CompareWithPreviousYear { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         Summary = await _revenueService.GetSummaryAsync(StartDate, EndDate);
         DailyRevenues = await _revenueService.GetDailyRevenueAsync(StartDate, EndDate);
         MonthlyRevenues = await _revenueService.GetMonthlyRevenueAsync(SelectedYear);
         TopProducts = await _revenueService.GetTopSellingProductsAsync(10);
+        CategoryRevenues = await _revenueService.GetRevenueByCategoryAsync(StartDate, EndDate);
+        AvailableYears = await _revenueService.GetAvailableYearsAsync();
+
+        // A1: Comparative Growth
+        if (CompareWithPreviousYear)
+        {
+            Comparison = await _revenueService.GetYearOverYearAsync(SelectedYear, SelectedYear - 1);
+        }
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetExportCsvAsync(DateTime startDate, DateTime endDate)
+    {
+        var csv = await _revenueService.ExportToCsvAsync(startDate, endDate);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(csv);
+        return File(bytes, "text/csv", $"revenue_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.csv");
     }
 }
