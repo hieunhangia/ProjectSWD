@@ -2,19 +2,24 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSWD.Data;
 using ProjectSWD.Data.Entities;
 using ProjectSWD.Data.Enums;
+using ProjectSWD.DTOs.Review;
 
 namespace ProjectSWD.Services.Customer
 {
-    public class FeedbackService(ApplicationDbContext context)
+    public class ReviewService(ApplicationDbContext context)
     {
-        public async Task<(string Name, string ImageUrl)?> GetProductInfoForRatingAsync(int productId)
+        public async Task<ProductInfoForRatingResponseDto?> GetProductInfoForRatingAsync(int productId)
         {
             var product = await context.Products
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null) return null;
-            return (product.Name, product.ImageUrl);
+            return new ProductInfoForRatingResponseDto 
+            { 
+                Name = product.Name, 
+                ImageUrl = product.ImageUrl 
+            };
         }
 
         public async Task<string?> ValidateFeedbackEligibilityAsync(string customerId, int orderId, int productId)
@@ -44,23 +49,23 @@ namespace ProjectSWD.Services.Customer
         // Hardcoded readonly list of profanities
         private readonly IReadOnlyList<string> _profanities = new List<string>
         {
-            "badword1", "badword2", "idiot", "stupid"
+            "chó", "rác", "ngu"
         }.AsReadOnly();
 
-        public async Task SubmitFeedbackAsync(string customerId, int orderId, int productId, int rating, string content)
+        public async Task SubmitFeedbackAsync(SubmitFeedbackRequestDto request)
         {
-            if (string.IsNullOrWhiteSpace(content))
+            if (string.IsNullOrWhiteSpace(request.Content))
             {
                 throw new ArgumentException("Review content cannot be empty.");
             }
 
-            if (rating < 1 || rating > 5)
+            if (request.Rating < 1 || request.Rating > 5)
             {
                 throw new ArgumentException("Rating must be between 1 and 5.");
             }
 
             // Check for profanities
-            var lowerContent = content.ToLowerInvariant();
+            var lowerContent = request.Content.ToLowerInvariant();
             if (_profanities.Any(lowerContent.Contains))
             {
                 throw new InvalidOperationException(
@@ -70,7 +75,7 @@ namespace ProjectSWD.Services.Customer
             // Validate order status and customer ownership
             var order = await context.Orders
                 .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == orderId && o.CustomerId == customerId);
+                .FirstOrDefaultAsync(o => o.Id == request.OrderId && o.CustomerId == request.CustomerId);
 
             if (order == null)
             {
@@ -84,7 +89,7 @@ namespace ProjectSWD.Services.Customer
             }
 
             // Check if product is in the order
-            var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == productId);
+            var orderItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == request.ProductId);
             if (orderItem == null)
             {
                 throw new InvalidOperationException("Không tìm thấy sản phẩm trong đơn hàng này.");
@@ -93,7 +98,7 @@ namespace ProjectSWD.Services.Customer
             // Check if review already exists
             var existingReview = await context.Reviews
                 .FirstOrDefaultAsync(r =>
-                    r.CustomerId == customerId && r.OrderId == orderId && r.ProductId == productId);
+                    r.CustomerId == request.CustomerId && r.OrderId == request.OrderId && r.ProductId == request.ProductId);
 
             if (existingReview != null)
             {
@@ -102,11 +107,11 @@ namespace ProjectSWD.Services.Customer
 
             var review = new Review
             {
-                CustomerId = customerId,
-                OrderId = orderId,
-                ProductId = productId,
-                Rating = rating,
-                Content = content,
+                CustomerId = request.CustomerId,
+                OrderId = request.OrderId,
+                ProductId = request.ProductId,
+                Rating = request.Rating,
+                Content = request.Content,
                 CreatedAt = DateTime.UtcNow
             };
 

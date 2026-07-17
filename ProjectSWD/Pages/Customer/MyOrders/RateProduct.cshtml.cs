@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ProjectSWD.DTOs.Review;
 using ProjectSWD.Services.Customer;
 
 namespace ProjectSWD.Pages.Customer.MyOrders
@@ -11,12 +12,12 @@ namespace ProjectSWD.Pages.Customer.MyOrders
     [Authorize]
     public class RateProductModel : PageModel
     {
-        private readonly FeedbackService _feedbackService;
+        private readonly ReviewService _reviewService;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public RateProductModel(FeedbackService feedbackService, UserManager<IdentityUser> userManager)
+        public RateProductModel(ReviewService reviewService, UserManager<IdentityUser> userManager)
         {
-            _feedbackService = feedbackService;
+            _reviewService = reviewService;
             _userManager = userManager;
         }
 
@@ -72,7 +73,15 @@ namespace ProjectSWD.Pages.Customer.MyOrders
 
             try
             {
-                await _feedbackService.SubmitFeedbackAsync(userId, OrderId, ProductId, Rating, Content);
+                var request = new SubmitFeedbackRequestDto
+                {
+                    CustomerId = userId,
+                    OrderId = OrderId,
+                    ProductId = ProductId,
+                    Rating = Rating,
+                    Content = Content
+                };
+                await _reviewService.SubmitFeedbackAsync(request);
                 TempData["SuccessMessage"] = "Cảm ơn bạn đã đánh giá!";
                 // In a real app, redirecting to PRG pattern is better. Here we just return Page with TempData.
                 return Page();
@@ -89,18 +98,18 @@ namespace ProjectSWD.Pages.Customer.MyOrders
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId != null)
             {
-                EligibilityError = await _feedbackService.ValidateFeedbackEligibilityAsync(userId, OrderId, ProductId);
+                EligibilityError = await _reviewService.ValidateFeedbackEligibilityAsync(userId, OrderId, ProductId);
             }
             else
             {
                 EligibilityError = "Bạn cần đăng nhập để thực hiện hành động này.";
             }
 
-            var productInfo = await _feedbackService.GetProductInfoForRatingAsync(ProductId);
-            if (productInfo.HasValue)
+            var productInfo = await _reviewService.GetProductInfoForRatingAsync(ProductId);
+            if (productInfo != null)
             {
-                ProductName = productInfo.Value.Name;
-                ProductImage = productInfo.Value.ImageUrl;
+                ProductName = productInfo.Name;
+                ProductImage = productInfo.ImageUrl;
             }
         }
     }
