@@ -1,6 +1,5 @@
 @page
 @model ProjectSWD.Pages.Admin.Promotion.IndexModel
-@using ProjectSWD.Data.Entities
 @{
     ViewData["Title"] = "Marketing & Promotions Console";
 }
@@ -59,7 +58,6 @@
                         <th>ID</th>
                         <th>Tên / Mã code</th>
                         <th>Giảm giá</th>
-                        <th>Phạm vi</th>
                         <th>Thời gian</th>
                         <th>Đơn tối thiểu</th>
                         <th>Giới hạn</th>
@@ -101,20 +99,6 @@
                                 @if (!promo.FixedAmount.HasValue && !promo.Percentage.HasValue)
                                 {
                                     <span class="text-muted">—</span>
-                                }
-                            </td>
-                            <td>
-                                @switch (promo.Scope)
-                                {
-                                    case PromotionScope.Global:
-                                        <span class="badge bg-info text-dark">🌐 Toàn bộ</span>
-                                        break;
-                                    case PromotionScope.Category:
-                                        <span class="badge bg-secondary">📂 Danh mục</span>
-                                        break;
-                                    case PromotionScope.SpecificSKU:
-                                        <span class="badge bg-secondary">📦 Cụ thể</span>
-                                        break;
                                 }
                             </td>
                             <td>

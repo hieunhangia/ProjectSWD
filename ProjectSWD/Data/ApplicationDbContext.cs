@@ -75,11 +75,6 @@ namespace ProjectSWD.Data
             modelBuilder.Entity<Promotion>()
                 .Property(p => p.Percentage).HasColumnType("decimal(5, 2)");
 
-            modelBuilder.Entity<Promotion>()
-                .Property(p => p.Scope)
-                .HasConversion<string>()
-                .HasMaxLength(50);
-
 
             modelBuilder.Entity<OrderItem>()
                 .HasKey(oi => new { oi.OrderId, oi.ProductId });

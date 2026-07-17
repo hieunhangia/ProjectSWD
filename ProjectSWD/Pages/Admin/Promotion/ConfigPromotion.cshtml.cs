@@ -51,15 +51,6 @@ public class ConfigPromotionModel : PageModel
     [BindProperty]
     public bool IsCodeBased { get; set; }
 
-    // ——— Scope ———
-
-    [BindProperty]
-    [Required(ErrorMessage = "Vui lòng chọn phạm vi áp dụng.")]
-    public string Scope { get; set; } = nameof(PromotionScope.Global);
-
-    [BindProperty]
-    public int? CategoryId { get; set; }
-
     [BindProperty]
     public List<int> SelectedProductIds { get; set; } = new();
 
@@ -92,13 +83,9 @@ public class ConfigPromotionModel : PageModel
     // ——— Presentation helpers ———
 
     public List<SelectListItem> ProductOptions { get; set; } = new();
-    public List<SelectListItem> CategoryOptions { get; set; } = new();
     public List<string> OverlapWarnings { get; set; } = new();
     public string? ErrorMessage { get; set; }
     public bool IsEdit => PromotionId.HasValue;
-    public bool IsGlobal => Scope == nameof(PromotionScope.Global);
-    public bool IsCategory => Scope == nameof(PromotionScope.Category);
-    public bool IsSpecificSKU => Scope == nameof(PromotionScope.SpecificSKU);
 
     public async Task<IActionResult> OnGetAsync(int? id)
     {
@@ -114,7 +101,6 @@ public class ConfigPromotionModel : PageModel
             Description = promo.Description;
             Code = promo.Code;
             IsCodeBased = !string.IsNullOrEmpty(promo.Code);
-            Scope = promo.Scope.ToString();
             Percentage = promo.Percentage;
             FixedAmount = promo.FixedAmount;
             StartTime = promo.StartTime;
@@ -153,16 +139,8 @@ public class ConfigPromotionModel : PageModel
         }
 
         // === E1: Overlapping campaign check ===
-        var productIds = Scope switch
-        {
-            nameof(PromotionScope.SpecificSKU) => SelectedProductIds,
-            nameof(PromotionScope.Category) when CategoryId.HasValue
-                => (await _promotionService.GetProductsByCategoryAsync(CategoryId.Value)).Select(p => p.Id).ToList(),
-            _ => new List<int>()
-        };
-
         OverlapWarnings = await _promotionService.CheckOverlappingConflictsAsync(
-            productIds, StartTime, EndTime, PromotionId);
+            StartTime, EndTime, PromotionId);
 
         if (!ModelState.IsValid)
         {
@@ -180,7 +158,6 @@ public class ConfigPromotionModel : PageModel
                 promo.Name = Name;
                 promo.Description = Description;
                 promo.Code = IsCodeBased ? Code : null;
-                promo.Scope = Enum.Parse<PromotionScope>(Scope);
                 promo.FixedAmount = FixedAmount;
                 promo.Percentage = Percentage;
                 promo.StartTime = StartTime;
@@ -191,9 +168,7 @@ public class ConfigPromotionModel : PageModel
                 promo.IsPercentage = Percentage.HasValue;
 
                 await _promotionService.UpdateAsync(promo);
-
-                if (promo.Scope == PromotionScope.SpecificSKU)
-                    await _promotionService.UpdatePromotionProductsAsync(promo.Id, SelectedProductIds);
+                await _promotionService.UpdatePromotionProductsAsync(promo.Id, SelectedProductIds);
 
                 TempData["SuccessMessage"] = "Promotion Strategy Successfully Scheduled/Activated";
             }
@@ -205,7 +180,6 @@ public class ConfigPromotionModel : PageModel
                     Name = Name,
                     Description = Description,
                     Code = IsCodeBased ? Code : null,
-                    Scope = Enum.Parse<PromotionScope>(Scope),
                     FixedAmount = FixedAmount,
                     Percentage = Percentage,
                     IsPercentage = Percentage.HasValue,
@@ -217,9 +191,7 @@ public class ConfigPromotionModel : PageModel
                 };
 
                 await _promotionService.CreateAsync(promo);
-
-                if (promo.Scope == PromotionScope.SpecificSKU)
-                    await _promotionService.UpdatePromotionProductsAsync(promo.Id, SelectedProductIds);
+                await _promotionService.UpdatePromotionProductsAsync(promo.Id, SelectedProductIds);
 
                 TempData["SuccessMessage"] = "Promotion Strategy Successfully Scheduled/Activated";
             }
@@ -240,13 +212,6 @@ public class ConfigPromotionModel : PageModel
             {
                 Value = p.Id.ToString(),
                 Text = $"{p.Name} - {p.Price:N0}₫"
-            }).ToList();
-
-        CategoryOptions = (await _promotionService.GetAllCategoriesAsync())
-            .Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
             }).ToList();
     }
 }

@@ -4,13 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjectSWD.Data.Entities
 {
-    public enum PromotionScope
-    {
-        Global,
-        Category,
-        SpecificSKU
-    }
-
     public class Promotion
     {
         public int Id { get; set; }
@@ -24,8 +17,6 @@ namespace ProjectSWD.Data.Entities
         /// <summary>Mã voucher (nếu là code-based promotion)</summary>
         [MaxLength(100)]
         public string? Code { get; set; }
-        
-        public PromotionScope Scope { get; set; } = PromotionScope.Global;
         
         /// <summary>True = Percentage, False = FixedAmount</summary>
         public bool IsPercentage { get; set; }

@@ -67,16 +67,14 @@ public class PromotionService
     }
 
     /// <summary>
-    /// E1: Check if any active promotion overlaps with the given product set in the same timeframe.
-    /// Returns conflict descriptions.
+    /// E1: Check if any active promotion overlaps in the same timeframe.
     /// </summary>
     public async Task<List<string>> CheckOverlappingConflictsAsync(
-        List<int> productIds, DateTime startTime, DateTime endTime, int? excludePromotionId = null)
+        DateTime startTime, DateTime endTime, int? excludePromotionId = null)
     {
         var conflicts = new List<string>();
 
         var activePromotions = _context.Promotions
-            .Include(p => p.PromotionProducts)
             .Where(p => !p.IsTerminated
                         && p.StartTime < endTime
                         && p.EndTime > startTime);
@@ -88,31 +86,7 @@ public class PromotionService
 
         foreach (var promo in activeList)
         {
-            // Global scope overlaps with everything
-            if (promo.Scope == PromotionScope.Global)
-            {
-                conflicts.Add($"Khuyến mãi \"{promo.Name}\" (Toàn bộ sản phẩm) đang hoạt động trong cùng khung thời gian.");
-                continue;
-            }
-
-            // Specific SKU overlap
-            if (promo.Scope == PromotionScope.SpecificSKU && productIds.Any())
-            {
-                var overlapProductIds = promo.PromotionProducts
-                    .Select(pp => pp.ProductId)
-                    .Intersect(productIds)
-                    .ToList();
-
-                if (overlapProductIds.Any())
-                {
-                    var overlapNames = await _context.Products
-                        .Where(p => overlapProductIds.Contains(p.Id))
-                        .Select(p => p.Name)
-                        .ToListAsync();
-
-                    conflicts.Add($"Khuyến mãi \"{promo.Name}\" áp dụng cho sản phẩm: {string.Join(", ", overlapNames)} — bị trùng lịch.");
-                }
-            }
+            conflicts.Add($"Khuyến mãi \"{promo.Name}\" đang hoạt động trong cùng khung thời gian.");
         }
 
         return conflicts;
@@ -134,19 +108,6 @@ public class PromotionService
         return await _context.Products
             .Include(p => p.Category)
             .Include(p => p.Unit)
-            .OrderBy(p => p.Name)
-            .ToListAsync();
-    }
-
-    public async Task<List<Category>> GetAllCategoriesAsync()
-    {
-        return await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-    }
-
-    public async Task<List<Product>> GetProductsByCategoryAsync(int categoryId)
-    {
-        return await _context.Products
-            .Where(p => p.CategoryId == categoryId)
             .OrderBy(p => p.Name)
             .ToListAsync();
     }

@@ -90,7 +90,7 @@
                     </div>
                 </div>
 
-                <h5 class="text-primary mt-4">Loại giảm giá & Phạm vi</h5>
+                <h5 class="text-primary mt-4">Loại giảm giá</h5>
                 <hr />
 
                 <div class="row mb-3">
@@ -114,35 +114,12 @@
                     </div>
                 </div>
 
-                @* === Target Scope === *@
                 <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Phạm vi áp dụng <span class="text-danger">*</span></label>
-                        <select asp-for="Scope" class="form-select" id="ScopeSelect">
-                            <option value="Global">🌐 Toàn bộ sản phẩm (Global)</option>
-                            <option value="Category">📂 Theo danh mục (Category)</option>
-                            <option value="SpecificSKU">📦 Sản phẩm cụ thể (Specific SKU)</option>
-                        </select>
-                    </div>
-                </div>
-
-                @* === Category scope (hidden unless Category) === *@
-                <div class="row mb-3" id="categoryScopeSection" style="display: @(Model.IsCategory ? "block" : "none")">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Danh mục</label>
-                        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
-                            <option value="">-- Chọn danh mục --</option>
-                        </select>
-                    </div>
-                </div>
-
-                @* === Specific SKU scope (hidden unless SpecificSKU) === *@
-                <div class="row mb-3" id="skuScopeSection" style="display: @(Model.IsSpecificSKU ? "block" : "none")">
                     <div class="col-md-8">
                         <label class="form-label fw-bold">Sản phẩm áp dụng</label>
                         <select asp-for="SelectedProductIds" asp-items="Model.ProductOptions" class="form-select" multiple size="6">
                         </select>
-                        <small class="text-muted">Giữ Ctrl để chọn nhiều sản phẩm.</small>
+                        <small class="text-muted">Giữ Ctrl để chọn nhiều sản phẩm. Để trống nếu áp dụng cho tất cả.</small>
                     </div>
                 </div>
 
@@ -194,16 +171,8 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // Toggle voucher code section
         document.getElementById('IsCodeBased').addEventListener('change', function () {
             document.getElementById('codeBasedSection').style.display = this.checked ? 'block' : 'none';
-        });
-
-        // Toggle scope sections
-        document.getElementById('ScopeSelect').addEventListener('change', function () {
-            const v = this.value;
-            document.getElementById('categoryScopeSection').style.display = v === 'Category' ? 'block' : 'none';
-            document.getElementById('skuScopeSection').style.display = v === 'SpecificSKU' ? 'block' : 'none';
         });
     </script>
 }
